@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Yummy Pins</title>
+  <script src="/static/lib/js/jquery-1.9.1.min.js"></script>
+  <script src="/static/lib/js/jquery-ui-1.10.2.core.min.js"></script>
+  <script src="/static/lib/js/bootstrap.min.js"></script>
+  <script src="/static/lib/js/jquery.cookie.js"></script>
+  <script src="/static/lib/js/jquery.tagtag.js"></script>
+  <script src="/static/js/dialog.js"></script>
+  <script src="/static/js/custom.js"></script>
+  <link href="/static/lib/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/static/lib/css/jquery.tagtag.css" rel="stylesheet" />
+  <link href="/static/css/custom.css" rel="stylesheet" />
+  {% block header %}
+  {% endblock %}
+</head>
+<body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="/">Yummy Pins</a>
+
+          <div class="nav-collapse collapse">
+            <ul class="nav pull-right">
+              {% if user %}
+              {% block pin_button %}
+              <li><button id="btn-pin" class="btn btn-primary">Pin!</button></li>
+              {% endblock %}
+              <li class="dropdown">
+                <a role="button" href="#" data-target="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.screen_name|default(user.email) }} <b class="caret"></b></a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                  <li><a href="/settings">Settings</a></li>
+                  <li><a href="/logout">Logout</a></li>
+                </ul>
+              </li>
+              {% else %}
+              <li><a id="btn-login" href="/login" class="navbar-link">Login</a></li>
+              <li><a id="btn-register" href="/register" class="navbar-link">Sign up</a></li>
+              {% endif %}
+            </ul>
+
+            <ul class="nav nav-main">
+              <li><a href="/">Explore</a></li>
+              {% if user %}
+              <li><a href="/me">Me</a></li>
+              {% endif %}
+            </ul>
+            <script>
+            $("ul.nav-main>li").each(function() {
+              if ($(this).find('a').attr('href') == location.pathname) {
+                $(this).addClass('active');
+              }
+            });
+            </script>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    {% block layout %}
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span9">
+          <div class="row-fluid">
+          {% block content %}
+          {% endblock %}
+          </div><!--/row-->
+        </div><!--/span-->
+
+        <div class="span3">
+          <div class="row-fluid">
+          {% block sidebar %}
+          {% endblock %}
+          </div>
+        </div>
+      </div><!--/row-->
+      <hr>
+      <footer>
+        {% include 'base/footer.html' %}
+      </footer>
+    </div><!--/.fluid-container-->
+    {% endblock %}
+
+    {% block bootscript %}
+    {% endblock %}
+
+    {% block extra_layers %}
+    {% if user %}
+    <div id="pin-dialog"></div>
+    {% endif %}
+    {% endblock %}
+
+</body>
+</html>

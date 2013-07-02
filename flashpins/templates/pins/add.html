@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<form class="form" method="POST" action="/p/add">
+{% csrf_token %}
+
+{{ form.as_p()|safe }}
+
+<input type="submit" class="btn btn-primary" value="Pin" name="" />
+
+</form>
+
+{% endblock %}
+
+

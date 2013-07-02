@@ -1,22 +1,69 @@
 # -*- coding: utf8 -*-
 
 import functools
-from flask import session
+from flask import session, request
+from flashpins import bcrypt
 
+from core.models import User
+
+def require_login():
+  """
+  Login required decorator
+  """
+
+  def outer(f):
+    @functools.wraps(f)
+    def _(*args, **kwargs):
+    
+      user_id = current_user_id()
+      if user_id:
+        return f(*args, **kwargs)
+
+      return redirect(url_for('login'))
+
+    return _
+
+  return outer
+
+
+def j_require_login():
+  """
+  Login required decorator for a JSON request handler
+  """
+
+  def outer(f):
+    @functools.wraps(f)
+    def _(*args, **kwargs):
+    
+      user_id = current_user_id()
+      if user_id:
+        return f(*args, **kwargs)
+
+      abort(403)
+
+    return _
+
+  return outer
+  
+
+def current_user_id():
+  user_id = session.get('LOGIN_USER_ID', None)
+  if user_id and User.exists(user_id):
+    return user_id
+
+  return None
 
 def new_user(email, password):
 
-    """
-    Make a new user, save it and return user_id
-    """
+  """
+  Make a new user, save it and return user_id
+  """
 
-    hasher = BCryptPasswordHasher()
+  # create new user and save it
+  password_digest = bcrypt.generate_password_hash(password)
+  user_id = User.new(email=email, screen_name='', password_digest=password_digest)
 
-    # create new user and save it
-    password_digest = hasher.encode(password, hasher.salt())
-    user_id = User.new(email=email, password_digest=password_digest)
-
-    return user_id
+  return user_id
 
   
 def set_screen_name(user_id, screen_name):
@@ -46,8 +93,7 @@ def authenticate(email, password):
   user_id = User.get_id_by_email(email)
   if user_id:
     user = User.get(user_id, ['password_digest'])
-    hasher = BCryptPasswordHasher()
-    if hasher.verify(password, user.password_digest):
+    if bcrypt.check_password_hash(user.password_digest, password):
       return user_id
 
     return False

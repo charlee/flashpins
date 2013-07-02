@@ -1,0 +1,14 @@
+{% extends 'users/settings-base.html' %}
+
+{% block content %}
+
+<form class="form" method="POST" action="/settings/import" enctype="multipart/form-data">
+{% csrf_token %}
+
+{{ form.as_p()|safe }}
+
+<input type="submit" class="btn btn-primary" value="Import" name="" />
+
+</form>
+
+{% endblock %}

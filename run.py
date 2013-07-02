@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding:utf8 -*-
 
 import os
@@ -10,4 +11,4 @@ if __name__ == '__main__':
 
   from flashpins import app
 
-  app.run(debug=app.config['DEBUG'], host='0.0.0.0')
+  app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=8000)

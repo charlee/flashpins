@@ -131,14 +131,14 @@ class BaseHash:
     Get the object reference by id.
     This method makes sure that the id exists, but will not fill any fields.
     """
-    if self.exists(id):
+    if cls.exists(id):
       return cls(id)
     else:
       return None
 
 
   @classmethod
-  def add(cls, id=None, **kwargs):
+  def new(cls, id=None, **kwargs):
     """
     Add a new object and return added id
     """
@@ -211,7 +211,7 @@ class Pin(BaseHash):
     'private': 0,
   }
 
-  def update_tags(self, add_tags=None, remove_tags=None)
+  def update_tags(self, add_tags=None, remove_tags=None):
     """
     Add or remove tags to current pin
     """
@@ -261,8 +261,8 @@ class User(BaseHash):
   }
 
   @classmethod
-  def add(cls, email, screen_name, password_digest):
-    user_id = super(User, cls).add(email=email, screen_name=screen_name, password_digest=password_digest)
+  def new(cls, email, screen_name, password_digest):
+    user_id = super(User, cls).new(email=email, screen_name=screen_name, password_digest=password_digest)
     rds.set(cls.KEY_EMAIL_REF % email, user_id)
     rds.set(cls.KEY_SCREEN_NAME_REF % screen_name, user_id)
 
@@ -285,13 +285,16 @@ class User(BaseHash):
 
 
   def add_pin_ref(self, pin_id):
-    rds.sadd(KEY_PINS % self.id, pin_id)
+    rds.sadd(self.KEY_PINS % self.id, pin_id)
 
   def remove_pin_ref(self, pin_id):
-    rds.srem(KEY_PINS % self.id, pin_id)
+    rds.srem(self.KEY_PINS % self.id, pin_id)
+
+  def pins(self):
+    return rds.smembers(self.KEY_PINS % self.id)
 
   def has_pin_ref(self, pin_id):
-    return rds.sismember(KEY_PINS % self.id, pin_id)
+    return rds.sismember(self.KEY_PINS % self.id, pin_id)
 
   def add_link_ref(self, link_id):
     rds.sadd(KEY_LINKS % self.id, link_id)

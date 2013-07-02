@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+{% if user %}
+
+<h3>Popular Links</h3>
+{% for link in popular_links %}
+
+<div class="pin">
+  <div class="pin-count pull-right"><span class="badge badge-info">{{ link.pin_count }}</span>people</div>
+  <div class="pin-title clearfix">
+    {% if link.icon %}
+    <img src="{{ link.icon }}" />
+    {% endif %}
+    <strong><a href="{{ link.short_url() }}" target="_blank">{{ link.title }}</a></strong>
+    {% if link.saved %}
+    <small><span class="pin-save">saved</span></small>
+    {% else %}
+    <small><a href="#" class="pin-save" link_id="{{ link.id }}">save this</a></small>
+    {% endif %}
+  </div>
+
+  <div class="pin-date pull-left"><small>{{ link.add_date }}</small></div>
+  <div class="pin-tags clearfix"></div>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="jumbotron">
+  <h1>Yummy.</h1>
+  <p class="lead">Share and discover yummy contents on the Internet.</p>
+  <p><a href="/signup" class="btn btn-primary btn-large">Sign Up &raquo;</a><p>
+
+
+</div>
+
+{% endif %}
+{% endblock %}
+

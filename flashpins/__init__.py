@@ -2,12 +2,21 @@
 
 import redis
 from flask import Flask, render_template
-
+from flask.ext.scss import Scss
+from flask.ext.csrf import csrf
+from flask.ext.bcrypt import Bcrypt
 
 # init global vars
 
 app = Flask(__name__)
 app.config.from_object('config')
+Scss(app)
+csrf(app)
+
+bcrypt = Bcrypt(app)
+
+# set app secret key for session
+app.secret_key = 'xnrMPl.f$)wjqt2mE`%O+GBEWv9Ill#qog`HS3VSw!Smz$v.!%RWvTOW`JS#@28n';
 
 rds = redis.StrictRedis(host=app.config['REDIS_HOST'],
                         port=app.config['REDIS_PORT'],

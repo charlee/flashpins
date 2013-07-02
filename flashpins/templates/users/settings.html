@@ -1,0 +1,11 @@
+{% extends 'users/settings-base.html' %}
+
+{% block content %}
+
+<form method="POST" action="/settings">
+{% csrf_token %}
+{{ form.as_p()|safe }}
+<input type="submit" class="btn btn-primary" value="Save" name="" />
+</form>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+
+{% block layout %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="row-fluid">
+      {% block sidebar %}
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list nav-settings">
+          <li><a href='/settings'>Profile</a></li>
+          <li><a href='/settings/account'>Account</a></li>
+          <li><a href='/settings/import'>Import Pins</a></li>
+        </ul>
+        <script>
+        $("ul.nav-settings>li").each(function() {
+          if ($(this).find('a').attr('href') == location.pathname) {
+            $(this).addClass('active');
+          }
+        });
+        </script>
+      </div>
+      {% endblock %}
+      </div>
+    </div>
+
+    <div class="span9">
+      <div class="row-fluid">
+      {% block content %}
+      {% endblock %}
+      </div><!--/row-->
+    </div><!--/span-->
+
+  </div><!--/row-->
+  <hr>
+  <footer>
+    {% include 'base/footer.html' %}
+  </footer>
+</div><!--/.fluid-container-->
+
+{% endblock %}
+
+{% block pin_button %}
+{% endblock %}
+

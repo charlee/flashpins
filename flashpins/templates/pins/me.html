@@ -1,0 +1,70 @@
+{% extends 'base/base.html' %}
+
+{% macro pager() %}
+<ul class="pager">
+  <li class="previous{% if not prev_page %} disabled{% endif %}">
+    {% if prev_page %}
+    <a href="/me?p={{ prev_page }}">Previous</a>
+    {% else %}
+    <a>Previous</a>
+    {% endif %}
+  </li>
+  <li class="next{% if not next_page %} disabled{% endif %}">
+    {% if next_page %}
+    <a href="/me?p={{ next_page }}">Next</a>
+    {% else %}
+    <a>Next</a>
+    {% endif %}
+  </li>
+</ul>
+{% endmacro %}
+
+{% block content %}
+
+{{ pager() }}
+
+{% for pin in pins %}
+
+<div class="pin">
+  <div class="pin-count pull-right"><span class="badge badge-info">{{ pin.link.pin_count }}</span>people</div>
+  <div class="pin-title clearfix">
+    {% if pin.link.icon %}
+    <img src="{{ pin.link.icon }}" />
+    {% endif %}
+    <strong><a href="{{ pin.link.short_url() }}" target="_blank">{{ pin.title }}</a></strong>
+    <small><a href="#" class="pin-edit" pin_id="{{ pin.id }}">edit this</a></small>
+  </div>
+
+  <div class="pin-date pull-left"><small>{{ pin.link.add_date }}</small></div>
+  <div class="pin-tags pull-left">
+  {% if pin.private %}
+    <span class="pin-tag label label-important">private</span>
+  {% endif %}
+  {% for tag in pin.tags() %}
+    <span class="pin-tag label"><a href="/t/{{ tag.name }}">{{ tag.name }}</a></span>
+  {% endfor %}
+  </div>
+  <div class="clearfix"></div>
+
+</div>
+
+{% endfor %}
+{{ pager() }}
+
+{% endblock %}
+
+
+{% block sidebar %}
+
+<div class="block">
+  <h4>My Tags</h4>
+
+  <ul>
+  {% for tag in my_tags %}
+  <li><a href="/t/{{ tag.name }}">{{ tag.name }}</a> ({{ tag.pin_count }})</li>
+  {% endfor %}
+  </ul>
+
+</div>
+
+{% endblock %}
