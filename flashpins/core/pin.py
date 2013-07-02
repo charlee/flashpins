@@ -1,0 +1,95 @@
+import logging
+
+import lxml.html
+from utils.crypt import urlhash
+from models import Link
+
+
+log = logging.getLogger('core')
+
+
+def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', private=False):
+  """
+  New pin
+  return None if already pinned this
+  """
+  link_id = get_link_id(url, title=title, icon=icon, add_date=add_date)
+
+  # get the link tilte to check if user changed the title
+  link = Link.get(link_id, ['title'])
+  if link.title == title:
+    # save None if user does not change the title
+    title = None
+
+  # check if user has already pinned this
+  user_ref = User.ref(user_id)
+  if not user_ref.has_link_ref(link_id):
+    
+    # not pinned yet, pin it
+    pin_id = Pin.new(link_id=link_id, user_id=user_id, title=title, desc=desc, add_date=add_date, private=(1 if private else 0))
+
+    # add pin & link references to user
+    user_ref.add_pin_ref(pin_id)
+    user_ref.add_link_ref(link_id)
+
+    # increase link's pinned count
+    link.inc_pinned_count()
+
+    # add tags to pin
+    if tags:
+      pin_ref = Pin.ref(pin_id)
+      pin_ref.update_tags(tags)
+      user_ref.update_pin_tags(pin_id, tags)
+
+    return pin_id
+
+  else:
+    # has alreay pinned
+    return None
+
+
+
+def update_pin(pin_id, url=None, title=None, desc=None, tags=None, private=None):
+  """
+  Update pin with data
+  None indicates no update on corresponding field
+  """
+
+  # prepare params
+  params = {}
+
+  if url is not None: parmas['url'] = url
+  if title is not None: params['title'] = title
+  if desc is not None: params['desc'] = desc
+  if private is not None: params['private'] = 1 if private else 0
+
+  # update pin
+  pin_ref = Pin.ref(pin_id)
+
+  if params:
+    pin_ref.update(**params)
+
+  # update pin tags
+  if tags:
+    pin = Pin.get(pin_id, ['user_id'])
+    user_ref = User.ref(pin.user_id)
+
+    old_tags = pin_ref.tags
+    new_tags = set(tags)
+    added_tags = new_tags - old_tags
+    removed_tags = old_tags - new_tags
+
+    pin_ref.update_tags(added_tags, removed_tags)
+    user_ref.update_pin_tags(pin_id, added_tags, removed_tags)
+
+
+def get_link_id(url, title='', icon='', add_date=None):
+
+  link_id = urlhash(url)
+
+  if not Link.exists(link_id):
+    link_id = Link.new(id=link_id, title=title, url=url, icon=icon, add_date=add_date)
+
+  return link_id
+
+
