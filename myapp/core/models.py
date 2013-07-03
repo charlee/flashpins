@@ -16,7 +16,7 @@ Define common ops for data models
 #######################################################################
 
 import re
-from flashpins import rds 
+from myapp import rds 
 
 # Link
 

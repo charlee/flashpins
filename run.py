@@ -7,8 +7,8 @@ import sys
 if __name__ == '__main__':
 
   BASEDIR = os.path.dirname(os.path.abspath(__file__))
-  sys.path.insert(0, os.path.join(BASEDIR, 'flashpins'))
+  sys.path.insert(0, os.path.join(BASEDIR, 'myapp'))
 
-  from flashpins import app
+  from myapp import app
 
   app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=8000)

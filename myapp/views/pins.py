@@ -3,7 +3,7 @@
 from flask import request, redirect, render_template
 from core.user import require_login, current_user_id
 from core.models import Pin, User
-from flashpins import app
+from myapp import app
 from utils.common import make_context
 from forms import PinAddForm
 

@@ -2,7 +2,7 @@
 
 import functools
 from flask import session, request
-from flashpins import bcrypt
+from myapp import bcrypt
 
 from core.models import User
 

@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 from flask import render_template, session
-from flashpins import app
+from myapp import app
 from core.user import current_user_id
 from core.models import User
 

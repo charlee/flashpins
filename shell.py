@@ -14,8 +14,8 @@ def make_shell():
 if __name__ == "__main__":
 
   BASEDIR = os.path.dirname(os.path.abspath(__file__))
-  sys.path.insert(0, os.path.join(BASEDIR, 'flashpins'))
+  sys.path.insert(0, os.path.join(BASEDIR, 'myapp'))
 
-  from flashpins import *
+  from myapp import *
 
   script.make_shell(make_shell, use_ipython=True)()

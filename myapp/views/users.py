@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
 from flask import render_template, request, redirect, url_for
-from flashpins import app
+from myapp import app
 from core.user import new_user, require_login, authenticate, login as user_login, logout as user_logout
 from core.models import User
 from utils.common import make_context

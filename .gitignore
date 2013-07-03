@@ -42,6 +42,6 @@ nosetests.xml
 *.swp
 
 # scss/coffee output
-flashpins/static/js/*.js
-flashpins/static/css/*.css
+myapp/static/js/*.js
+myapp/static/css/*.css
 

@@ -33,7 +33,7 @@ rds = redis.StrictRedis(host=app.config['REDIS_HOST'],
 
 # import views
 
-import flashpins.views
+import myapp.views
 
 
 # common handlers
