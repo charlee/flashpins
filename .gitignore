@@ -40,3 +40,8 @@ nosetests.xml
 
 # tmp files
 *.swp
+
+# scss/coffee output
+flashpins/static/js/*.js
+flashpins/static/css/*.css
+

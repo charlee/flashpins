@@ -1,16 +1,23 @@
 # -*- coding: utf8 -*-
 
+import os
 import redis
 from flask import Flask, render_template
 from flask.ext.scss import Scss
 from flask.ext.csrf import csrf
 from flask.ext.bcrypt import Bcrypt
+from flask.ext.coffee2js import coffee2js
 
 # init global vars
 
 app = Flask(__name__)
 app.config.from_object('config')
-Scss(app)
+
+# auto convert scss and coffee only in dev env
+if app.debug:
+  Scss(app)
+  coffee2js(app, coffee_folder=os.path.join(app.root_path, 'assets/coffee'))
+
 csrf(app)
 
 bcrypt = Bcrypt(app)
