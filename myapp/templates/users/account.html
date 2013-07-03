@@ -1,10 +1,14 @@
 {% extends 'users/settings-base.html' %}
+{% from "base/_formhelpers.html" import render_field %}
 
 {% block content %}
 
 <form method="POST" action="/settings/account">
-{% csrf_token %}
-{{ form.as_p()|safe }}
+<input type='hidden' name='_csrf_token' value="{{ csrf_token() }}">
+
+{{ render_field(form.password) }}
+{{ render_field(form.confirm_password) }}
+
 <input type="submit" class="btn btn-primary" value="Save" name="" />
 </form>
 

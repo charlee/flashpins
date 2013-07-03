@@ -2,7 +2,7 @@ import logging
 
 import lxml.html
 from utils.crypt import urlhash
-from models import Link
+from models import Link, User, Pin
 
 
 log = logging.getLogger('core')
@@ -19,7 +19,7 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
   link = Link.get(link_id, ['title'])
   if link.title == title:
     # save None if user does not change the title
-    title = None
+    title = ''
 
   # check if user has already pinned this
   user_ref = User.ref(user_id)

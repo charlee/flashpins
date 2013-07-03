@@ -24,3 +24,4 @@ class SettingsAccountForm(Form):
 class PinAddForm(Form):
   title= TextField()
   url = TextField()
+  desc = TextField()

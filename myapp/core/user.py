@@ -86,6 +86,16 @@ def set_screen_name(user_id, screen_name):
 
   return True
 
+def update_password(user_id, password):
+  """
+  Update user's password
+  """
+
+  user = User.ref(user_id)
+  if user:
+    password_digest = bcrypt.generate_password_hash(password)
+    user.update(password_digest=password_digest)
+
 def authenticate(email, password):
   """
   Verify if Email and password are correct

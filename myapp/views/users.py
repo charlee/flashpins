@@ -2,7 +2,7 @@
 
 from flask import render_template, request, redirect, url_for
 from myapp import app
-from core.user import new_user, require_login, authenticate, login as user_login, logout as user_logout
+from core.user import new_user, update_password, current_user_id, require_login, authenticate, login as user_login, logout as user_logout
 from core.models import User
 from utils.common import make_context
 
@@ -19,7 +19,7 @@ def login():
 
   if request.method == 'POST' and form.validate():
     email = form.email.data
-    password = form.email.password
+    password = form.password.data
     user_id = authenticate(email, password)
     if user_id:
       user_login(user_id)
@@ -86,7 +86,7 @@ def settings():
 
 @app.route('/settings/account', methods=['POST', 'GET'])
 @require_login()
-def account(request):
+def account():
   """
   Change password, etc
   """
@@ -96,7 +96,7 @@ def account(request):
   if request.method == 'POST' and form.validate():
     
     password = form.password.data
-    # TODO
+    update_password(current_user_id(), password)
 
     return redirect(url_for('account'))
 

@@ -31,7 +31,7 @@
     {% if pin.link.icon %}
     <img src="{{ pin.link.icon }}" />
     {% endif %}
-    <strong><a href="{{ pin.link.short_url() }}" target="_blank">{{ pin.title }}</a></strong>
+    <strong><a href="{{ pin.link.short_url() }}" target="_blank">{{ pin.title|default(pin.link.title, true) }}</a></strong>
     <small><a href="#" class="pin-edit" pin_id="{{ pin.id }}">edit this</a></small>
   </div>
 

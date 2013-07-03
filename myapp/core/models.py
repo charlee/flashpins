@@ -162,8 +162,8 @@ class BaseHash:
     """
     
     # update data to db
-    params = cls._filter_params(kwargs)
-    rds.hmset(cls.KEY % self.id, params)
+    params = self._filter_params(kwargs)
+    rds.hmset(self.KEY % self.id, params)
 
     # update object
     for k, v in kwargs.iteritems():
@@ -184,23 +184,26 @@ class Link(BaseHash):
   }
 
   def inc_pinned_count(self):
-    rds.incr(KEY_PINNED_COUNT % self.id)
+    rds.incr(self.KEY_PINNED_COUNT % self.id)
 
   def dec_pinned_count(self):
-    rds.decr(KEY_PINNED_COUNT % self.id)
+    rds.decr(self.KEY_PINNED_COUNT % self.id)
     
 
   def inc_viewed_count(self):
-    rds.incr(KEY_VIEWED_COUNT % self.id)
+    rds.incr(self.KEY_VIEWED_COUNT % self.id)
 
   def dec_viewed_count(self):
-    rds.dec(KEY_VIEWED_COUNT % self.id)
+    rds.dec(self.KEY_VIEWED_COUNT % self.id)
+
+  def short_url(self):
+    return '/i/%s' % self.id
+    
 
       
 class Pin(BaseHash):
 
   KEY_TAGS = 'fp:pin:%s:tags'
-
 
   fields = {
     'title': '',
@@ -222,9 +225,8 @@ class Pin(BaseHash):
       rds.srem(self.KEY_TAGS % self.id, *tags)
       
 
-  @property
   def tags(self):
-    if self._tags is None:
+    if not hasattr(self, '_tags') or self._tags is None:
       self._tags = rds.smembers(self.KEY_TAGS % self.id)
     return self._tags
 
@@ -297,13 +299,13 @@ class User(BaseHash):
     return rds.sismember(self.KEY_PINS % self.id, pin_id)
 
   def add_link_ref(self, link_id):
-    rds.sadd(KEY_LINKS % self.id, link_id)
+    rds.sadd(self.KEY_LINKS % self.id, link_id)
 
   def remove_link_ref(self, link_id):
-    rds.srem(KEY_LINKS % self.id, link_id)
+    rds.srem(self.KEY_LINKS % self.id, link_id)
 
   def has_link_ref(self, link_id):
-    return rds.sismember(KEY_LINKS % self.id, link_id)
+    return rds.sismember(self.KEY_LINKS % self.id, link_id)
 
 
   def update_pin_tags(self, pin_id, add_tags=None, remove_tags=None):
