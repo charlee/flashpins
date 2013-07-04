@@ -1,10 +1,13 @@
 from myapp import app
-from flask import request, jsonify, abort, make_response
-from core.user import j_require_login
+from flask import Blueprint, request, jsonify, abort, make_response
+from core.user import j_require_login, current_user_id
 from core.pin import new_pin, remove_pin, update_pin
 from core.models import Pin, Link
+from flask.ext.csrf import csrf_exempt
 
-@app.route('/j/pins/<int:pin_id>', methods=['GET'])
+api_pins = Blueprint('api_pins', __name__)
+
+@api_pins.route('/<int:pin_id>', methods=['GET'])
 def pin_show(pin_id):
   pin = Pin.get(pin_id)
   if not pin:
@@ -21,23 +24,27 @@ def pin_show(pin_id):
   return jsonify(result)
 
 
-@app.route('/j/pins/<int:pin_id>', methods=['PATCH'])
+@api_pins.route('/<int:pin_id>', methods=['PATCH'])
 def pin_update(pin_id):
 
   if not request.json:
     abort(400)
 
   p = request.json
-  params = dict([(k, p.get(k)) for k in ['title', 'desc', 'tags', 'private'] if k in p])
+  params = dict([(k, p.get(k)) for k in ['title', 'desc', 'private'] if k in p])
+  if 'tags' in p:
+    params['tags'] = filter(None, p.get('tags').split(','))
+
   update_pin(pin_id=pin_id, **params)
 
   return jsonify({ 'id': pin_id })
 
 
-@app.route('/j/pins/', methods=['POST'])
+@csrf_exempt
+@api_pins.route('/', methods=['POST'])
 @j_require_login()
 def pin_create():
-  if not request.json or not pin.get('url'):
+  if not request.json or not request.json.get('url'):
     abort(400)
 
   p = request.json
@@ -46,17 +53,17 @@ def pin_create():
                    user_id=current_user_id(),
                    title=p.get('title'),
                    desc=p.get('desc'),
-                   tags=p.get('tags'),
+                   tags=filter(None, p.get('tags').split(',')),
                    private=p.get('private'))
 
   if pin_id:
-    return make_response(jsonify({ 'id': pin_id }), 201)
+    return make_response(jsonify({ 'id': pin_id }), 200)
 
   else:
     abort(409)
 
 
-@app.route('/j/pins/<int:pin_id>', methods=['DELETE'])
+@api_pins.route('/<int:pin_id>', methods=['DELETE'])
 def pin_destroy(pin_id):
 
   remove_pin(pin_id)

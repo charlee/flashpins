@@ -73,7 +73,7 @@ def update_pin(pin_id, title=None, desc=None, tags=None, private=None):
     pin = Pin.get(pin_id, ['user_id'])
     user_ref = User.ref(pin.user_id)
 
-    old_tags = pin_ref.tags
+    old_tags = pin_ref.tags()
     new_tags = set(tags)
     added_tags = new_tags - old_tags
     removed_tags = old_tags - new_tags

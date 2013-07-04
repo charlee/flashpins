@@ -62,16 +62,30 @@ class BaseHash:
   __metaclass__ = BaseModelMeta
 
   def __init__(self, id, *args, **kwargs):
+
+    # id is always str
     self.id = str(id)
+
     for field in self.fields.keys():
-      setattr(self, field, kwargs.get(field, self.fields[field]))
+
+      default = self.fields[field]
+      v = kwargs.get(field, str(default))
+
+      # convert str to unicode
+      if type(v) == str:
+        v = v.decode('utf-8')
+
+      setattr(self, field, v)
 
   def __repr__(self):
     keys = self.fields.keys()
-    values = [getattr(self, key) for key in keys]
+    values = [getattr(self, key).encode('utf-8') for key in keys]
     attrs = ', '.join('%s=%s' % pair for pair in zip(keys, values))
 
     return "<%s: id=%s, %s>" % (self.__class__.__name__, self.id, attrs)
+
+  def __unicode__(self):
+    return self.__repr__()
 
   def as_hash(self):
     h = { 'id': self.id }
@@ -94,6 +108,7 @@ class BaseHash:
       return None
 
     result = rds.hmget(cls.KEY % id, fields)
+
     return cls(id, **dict(zip(fields, result)))
 
   @classmethod
@@ -245,7 +260,7 @@ class Pin(BaseHash):
       rds.sadd(self.KEY_TAGS % self.id, *add_tags)
 
     if remove_tags:
-      rds.srem(self.KEY_TAGS % self.id, *tags)
+      rds.srem(self.KEY_TAGS % self.id, *remove_tags)
       
 
   def tags(self):

@@ -9,7 +9,10 @@ from utils.common import make_context
 
 import pins
 import users
-import j
+
+from views.api.pins import api_pins
+
+app.register_blueprint(api_pins, url_prefix='/j/pins')
 
 @app.route('/')
 def index():

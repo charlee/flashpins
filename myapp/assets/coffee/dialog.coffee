@@ -137,7 +137,8 @@ $.widget 'idv2.pinDialog', $.idv2.baseDialog,
         @pinId = data.id
         $.get('/j/pins/' + parseInt(data.id), (data) =>
           @pinTitle.val(data.title)
-          @pinURL.val(data.url)
+          @pinDesc.val(data.desc)
+          @pinURL.val(data.link.url)
           @pinTags.val(data.tags.join(','))
           @pinTags.tagtag("importTags")
         , 'json')
@@ -168,7 +169,7 @@ $.widget 'idv2.pinDialog', $.idv2.baseDialog,
 
     errorHandler = ->
     
-    successHandler = ->
+    successHandler = =>
       @close()
       location.reload()
 
@@ -177,10 +178,20 @@ $.widget 'idv2.pinDialog', $.idv2.baseDialog,
 
       when 'new', 'pin'
         # TODO: data validation
-        $.post('/j/pins', pin, successHandler).fail(errorHandler)
+        $.ajax '/j/pins/'
+          type: 'POST',
+          contentType: 'application/json'
+          data: JSON.stringify(pin)
+          success: successHandler
+          error: errorHandler
 
       when 'edit'
-        $.post('/j/pins/' + parseInt(@pinId), pin, successHandler).fail(errorHandler)
+        $.ajax '/j/pins/' + parseInt(@pinId),
+          type: 'PATCH'
+          contentType: 'application/json'
+          data: JSON.stringify(pin)
+          success: successHandler
+          error: errorHandler
 
       
 
