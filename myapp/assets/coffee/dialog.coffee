@@ -16,8 +16,8 @@ $.widget 'idv2.baseDialog',
 
     # dialog header
     @header = $("<div>").addClass("modal-header").appendTo(@dialog)
-    $("<button>").addClass("close").html("&times;").appendTo(@dialog).click =>
-      @close
+    $("<button>").addClass("close").html("&times;").appendTo(@header).click =>
+      @close()
     @title = $("<h3>").appendTo(@header)
 
     # dialog body
@@ -166,9 +166,9 @@ $.widget 'idv2.pinDialog', $.idv2.baseDialog,
       desc: @pinDesc.val()
       tags: @pinTags.val()
 
-    errorHandler: ->
+    errorHandler = ->
     
-    successHandler: ->
+    successHandler = ->
       @close()
       location.reload()
 
