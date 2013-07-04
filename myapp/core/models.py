@@ -73,6 +73,12 @@ class BaseHash:
 
     return "<%s: id=%s, %s>" % (self.__class__.__name__, self.id, attrs)
 
+  def as_hash(self):
+    h = { 'id': self.id }
+    for field in self.fields.keys():
+      h[field] = getattr(self, field)
+    return h
+      
   @classmethod
   def get(cls, id, fields=None):
     """
@@ -84,12 +90,11 @@ class BaseHash:
     if not fields:
       fields = cls.fields.keys()
 
-    result = rds.hmget(cls.KEY % id, fields)
-    if result:
-      return cls(id, **dict(zip(fields, result)))
+    if not cls.exists(id):
+      return None
 
-    return None
-  
+    result = rds.hmget(cls.KEY % id, fields)
+    return cls(id, **dict(zip(fields, result)))
 
   @classmethod
   def mget(cls, ids, fields=None):
@@ -169,6 +174,13 @@ class BaseHash:
     for k, v in kwargs.iteritems():
       setattr(self, k, v)
 
+  @classmethod
+  def remove(cls, id):
+    """
+    Delete specified object
+    """
+    rds.delete(cls.KEY % id)
+
 
 
 class Link(BaseHash):
@@ -187,6 +199,7 @@ class Link(BaseHash):
     rds.incr(self.KEY_PINNED_COUNT % self.id)
 
   def dec_pinned_count(self):
+    # TODO: make sure counter >= 0
     rds.decr(self.KEY_PINNED_COUNT % self.id)
     
 
@@ -198,6 +211,16 @@ class Link(BaseHash):
 
   def short_url(self):
     return '/i/%s' % self.id
+
+  @classmethod
+  def remove(cls, id):
+    """
+    Delete a link
+    """
+    super(Link, cls).remove(id)
+
+    # clear the counters
+    p.delete(cls.KEY_PINNED_COUNT % id, cls.KEY_VIEWED_COUNT % id)
     
 
       
@@ -229,6 +252,16 @@ class Pin(BaseHash):
     if not hasattr(self, '_tags') or self._tags is None:
       self._tags = rds.smembers(self.KEY_TAGS % self.id)
     return self._tags
+
+  def as_hash(self):
+    h = super(Pin, self).as_hash()
+    h['tags'] = list(self.tags())
+    return h
+
+  @classmethod
+  def remove(cls, id):
+    super(Pin, cls).remove(id)
+    rds.delete(cls.KEY_TAGS % id)
 
 
 class User(BaseHash):

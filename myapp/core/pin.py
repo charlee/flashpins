@@ -49,7 +49,7 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
 
 
 
-def update_pin(pin_id, url=None, title=None, desc=None, tags=None, private=None):
+def update_pin(pin_id, title=None, desc=None, tags=None, private=None):
   """
   Update pin with data
   None indicates no update on corresponding field
@@ -58,7 +58,6 @@ def update_pin(pin_id, url=None, title=None, desc=None, tags=None, private=None)
   # prepare params
   params = {}
 
-  if url is not None: parmas['url'] = url
   if title is not None: params['title'] = title
   if desc is not None: params['desc'] = desc
   if private is not None: params['private'] = 1 if private else 0
@@ -93,3 +92,24 @@ def get_link_id(url, title='', icon='', add_date=None):
   return link_id
 
 
+
+def remove_pin(pin_id):
+  """
+  Delete a pin from database
+  """
+
+  pin = Pin.get(pin_id)
+
+  if pin:
+
+    # remove user ref
+    user_ref = User.ref(pin.user_id)
+    user_ref.remove_pin_ref(pin_id)
+    user_ref.remove_link_ref(pin.link_id)
+
+    # decrease link counter
+    link_ref = Link.ref(pin.link_id)
+    link_ref.dec_pinned_count()
+
+    # remove pin
+    Pin.remove(pin_id)
