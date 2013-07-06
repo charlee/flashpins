@@ -210,8 +210,10 @@ class Link(BaseHash):
     'add_date': 0,
   }
 
+
   def inc_pinned_count(self):
     rds.incr(self.KEY_PINNED_COUNT % self.id)
+
 
   def dec_pinned_count(self):
     # TODO: make sure counter >= 0
@@ -221,11 +223,10 @@ class Link(BaseHash):
   def inc_viewed_count(self):
     rds.incr(self.KEY_VIEWED_COUNT % self.id)
 
+
   def dec_viewed_count(self):
     rds.dec(self.KEY_VIEWED_COUNT % self.id)
 
-  def short_url(self):
-    return '/i/%s' % self.id
 
   @classmethod
   def remove(cls, id):
@@ -264,14 +265,21 @@ class Pin(BaseHash):
       
 
   def tags(self):
+    """
+    return tags (list)
+    """
     if not hasattr(self, '_tags') or self._tags is None:
-      self._tags = rds.smembers(self.KEY_TAGS % self.id)
+      self._tags = list(rds.smembers(self.KEY_TAGS % self.id))
+      self._tags.sort()
+
     return self._tags
+
 
   def as_hash(self):
     h = super(Pin, self).as_hash()
-    h['tags'] = list(self.tags())
+    h['tags'] = self.tags()
     return h
+
 
   @classmethod
   def remove(cls, id):
@@ -281,26 +289,26 @@ class Pin(BaseHash):
 
 class User(BaseHash):
 
-  # link references
+  # link references(SET)
   # used by core.pin.new_pin to check if user has already pinned a link
   KEY_LINKS = 'fp:user:%s:links'
 
-  # pin references
+  # pin references(LIST)
   # used for listing a user's pins
   KEY_PINS = 'fp:user:%s:pins'
 
-  # reverse ref (email -> user id)
+  # reverse ref (email -> user id) (HASH)
   # used by login and register check
   KEY_EMAIL_REF = 'fp:user:email:%s'
 
-  # reverse ref (screen name -> user id)
+  # reverse ref (screen name -> user id) (HASH)
   # used by screen name check and user homepage
   KEY_SCREEN_NAME_REF = 'fp:user:screen_name:%s'
 
-  # all tags that used by user
+  # all tags that used by user (SET)
   KEY_TAGS = 'fp:user:%s:tags'
 
-  # store pins under a tag
+  # store pins under a tag (SET)
   KEY_TAG_PINS = 'fp:user:%s:tag:%s:pins'
 
   fields = {
@@ -318,6 +326,7 @@ class User(BaseHash):
 
     return user_id
 
+
   @classmethod
   def get_id_by_email(cls, email):
     """
@@ -334,31 +343,72 @@ class User(BaseHash):
     return rds.get(cls.KEY_SCREEN_NAME_REF % screen_name)
 
 
-  def add_pin_ref(self, pin_id):
-    rds.sadd(self.KEY_PINS % self.id, pin_id)
+  def add_pin(self, pin_id):
+    """
+    Add pin to current user's pin list
+    """
+    rds.lpush(self.KEY_PINS % self.id, pin_id)
 
-  def remove_pin_ref(self, pin_id):
-    rds.srem(self.KEY_PINS % self.id, pin_id)
 
-  def pins(self):
-    return rds.smembers(self.KEY_PINS % self.id)
+  def remove_pin(self, pin_id):
+    """
+    Remove pin from current user's pin list
+    """
+    rds.lrem(self.KEY_PINS % self.id, 1, pin_id)
 
-  def has_pin_ref(self, pin_id):
-    return rds.sismember(self.KEY_PINS % self.id, pin_id)
 
-  def add_link_ref(self, link_id):
+  def pins(self, start=None, end=None):
+    """
+    Get [start..end) of the user's pins
+    """
+    if start is None or end is None:
+      start = 0
+      end = rds.llen(self.KEY_PINS % self.id)
+
+    return rds.lrange(self.KEY_PINS % self.id, start, end - 1)
+
+
+  def pin_count(self):
+    """
+    Get pin count
+    """
+    return rds.llen(self.KEY_PINS % self.id)
+
+
+  def add_link(self, link_id):
+    """
+    Add link to current user's link set
+    """
     rds.sadd(self.KEY_LINKS % self.id, link_id)
 
-  def remove_link_ref(self, link_id):
+
+  def remove_link(self, link_id):
+    """
+    Remove link from current user's link set
+    """
     rds.srem(self.KEY_LINKS % self.id, link_id)
 
-  def has_link_ref(self, link_id):
+
+  def has_link(self, link_id):
+    """
+    Check if link_id is in current user's link set
+    """
     return rds.sismember(self.KEY_LINKS % self.id, link_id)
 
-  def tags(self):
+
+  def tags(self, with_count=False):
+    """
+    Get user's tags (list)
+      with_count: return (tag, count) tuple if True
+    """
     if not hasattr(self, '_tags') or self._tags is None:
-      self._tags = rds.smembers(self.KEY_TAGS % self.id)
-    return self._tags
+      self._tags = list(rds.smembers(self.KEY_TAGS % self.id))
+      self._tags.sort()
+
+    if with_count:
+      return [ (tag, rds.scard(self.KEY_TAG_PINS % (self.id, tag))) for tag in self._tags ]
+    else:
+      return self._tags
 
 
   def update_pin_tags(self, pin_id, add_tags=None, remove_tags=None):
@@ -368,12 +418,12 @@ class User(BaseHash):
     p = rds.pipeline()
 
     if add_tags:
-      p.sadd(self.KEY_TAGS % self.id, *list(add_tags))
+      p.sadd(self.KEY_TAGS % self.id, *add_tags)
       for tag in add_tags:
         p.sadd(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 
     if remove_tags:
-      p.srem(self.KEY_TAGS % self.id, *list(remove_tags))
+      p.srem(self.KEY_TAGS % self.id, *remove_tags)
       for tag in remove_tags:
         p.srem(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 

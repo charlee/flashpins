@@ -31,7 +31,7 @@
     {% if pin.link.icon %}
     <img src="{{ pin.link.icon }}" />
     {% endif %}
-    <strong><a href="{{ pin.link.short_url() }}" target="_blank">{{ pin.title|default(pin.link.title, true) }}</a></strong>
+    <strong><a href="/i/{{ pin.link.id }}" target="_blank">{{ pin.title|default(pin.link.title, true) }}</a></strong>
     <small><a href="#" class="pin-edit" pin_id="{{ pin.id }}">edit this</a></small>
   </div>
 
@@ -61,7 +61,7 @@
 
   <ul>
   {% for tag in my_tags %}
-  <li><a href="/t/{{ tag }}">{{ tag }}</a> ({{ tag.pin_count }})</li>
+  <li><a href="/t/{{ tag[0] }}">{{ tag[0] }}</a> ({{ tag[1] }})</li>
   {% endfor %}
   </ul>
 

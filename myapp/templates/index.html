@@ -12,7 +12,7 @@
     {% if link.icon %}
     <img src="{{ link.icon }}" />
     {% endif %}
-    <strong><a href="{{ link.short_url() }}" target="_blank">{{ link.title }}</a></strong>
+    <strong><a href="/i/{{ link.id }}" target="_blank">{{ link.title }}</a></strong>
     {% if link.saved %}
     <small><span class="pin-save">saved</span></small>
     {% else %}

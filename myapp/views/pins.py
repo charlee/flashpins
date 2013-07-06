@@ -74,15 +74,16 @@ def me():
   """
 
   user_ref = User.ref(current_user_id())
-  pin_ids = list(user_ref.pins())
+  pin_count = user_ref.pin_count()
 
   # pagination
   page = request.args.get('p', 1)
-  (pin_ids, total_page) = paginate(pin_ids, page, app.config['PAGE_SIZE'])
+
+  (start, end, total_page) = paginate(pin_count, page, app.config['PAGE_SIZE'])
 
 
-  # get objects
-
+  # get pins
+  pin_ids = user_ref.pins(start, end)
   pins = Pin.mget(pin_ids)
 
   link_ids = [ pin.link_id for pin in pins ]
@@ -92,7 +93,7 @@ def me():
     pin.link = link
 
   # get my tags
-  my_tags = user_ref.tags()
+  my_tags = user_ref.tags(with_count=True)
 
   context = make_context({
     'pins': pins,

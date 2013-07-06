@@ -23,14 +23,14 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
 
   # check if user has already pinned this
   user_ref = User.ref(user_id)
-  if not user_ref.has_link_ref(link_id):
+  if not user_ref.has_link(link_id):
     
     # not pinned yet, pin it
     pin_id = Pin.new(link_id=link_id, user_id=user_id, title=title, desc=desc, add_date=add_date, private=(1 if private else 0))
 
     # add pin & link references to user
-    user_ref.add_pin_ref(pin_id)
-    user_ref.add_link_ref(link_id)
+    user_ref.add_pin(pin_id)
+    user_ref.add_link(link_id)
 
     # increase link's pinned count
     link.inc_pinned_count()
@@ -73,10 +73,10 @@ def update_pin(pin_id, title=None, desc=None, tags=None, private=None):
     pin = Pin.get(pin_id, ['user_id'])
     user_ref = User.ref(pin.user_id)
 
-    old_tags = pin_ref.tags()
+    old_tags = set(pin_ref.tags())
     new_tags = set(tags)
-    added_tags = new_tags - old_tags
-    removed_tags = old_tags - new_tags
+    added_tags = list(new_tags - old_tags)
+    removed_tags = list(old_tags - new_tags)
 
     pin_ref.update_tags(added_tags, removed_tags)
     user_ref.update_pin_tags(pin_id, added_tags, removed_tags)
@@ -104,8 +104,8 @@ def remove_pin(pin_id):
 
     # remove user ref
     user_ref = User.ref(pin.user_id)
-    user_ref.remove_pin_ref(pin_id)
-    user_ref.remove_link_ref(pin.link_id)
+    user_ref.remove_pin(pin_id)
+    user_ref.remove_link(pin.link_id)
 
     # decrease link counter
     link_ref = Link.ref(pin.link_id)

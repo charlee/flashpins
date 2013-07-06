@@ -18,7 +18,7 @@ def make_context(params):
   return context
 
 
-def paginate(ids, page, page_size):
+def paginate(size, page, page_size):
   """
   paginate the objects
     ids: object ids that need to be paginated
@@ -26,15 +26,19 @@ def paginate(ids, page, page_size):
     page_size: page_size
 
   return:
-    paginated_ids, total_page
+    start, end, total_page
   """
-  size = len(ids)
   total_page = size / page_size
 
   if total_page * page_size > size:
     total_page += 1
 
-  # adjust current page number
+  # normalize current page number
+  if type(page) == str:
+    if page.isdigit():
+      page = int(page)
+    else:
+      page = 1
   if page < 1: page = 1
   if page > total_page: page = total_page
 
@@ -42,4 +46,4 @@ def paginate(ids, page, page_size):
   start = page * page_size
   end = start + page_size if page < total_page else size
 
-  return ids[start:end], total_page
+  return start, end, total_page
