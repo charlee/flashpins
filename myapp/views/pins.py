@@ -6,7 +6,7 @@ from core.user import require_login, current_user_id
 from core.pin import new_pin
 from core.models import Pin, User, Link
 from myapp import app
-from utils.common import make_context
+from utils.common import make_context, paginate
 from forms import PinAddForm
 
 
@@ -73,10 +73,16 @@ def me():
   Show "My Pins" page
   """
 
-  # TODO: pagination
-
   user_ref = User.ref(current_user_id())
-  pin_ids = user_ref.pins()
+  pin_ids = list(user_ref.pins())
+
+  # pagination
+  page = request.args.get('p', 1)
+  (pin_ids, total_page) = paginate(pin_ids, page, app.config['PAGE_SIZE'])
+
+
+  # get objects
+
   pins = Pin.mget(pin_ids)
 
   link_ids = [ pin.link_id for pin in pins ]
@@ -85,5 +91,13 @@ def me():
   for pin, link in zip(pins, links):
     pin.link = link
 
-  context = make_context({ 'pins': pins })
+  # get my tags
+  my_tags = user_ref.tags()
+
+  context = make_context({
+    'pins': pins,
+    'prev_page': (page - 1) if (page > 1) else 0,
+    'next_page': (page + 1) if (page < total_page) else 0,
+    'my_tags': my_tags,
+  })
   return render_template('pins/me.html', **context)

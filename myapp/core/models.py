@@ -355,6 +355,11 @@ class User(BaseHash):
   def has_link_ref(self, link_id):
     return rds.sismember(self.KEY_LINKS % self.id, link_id)
 
+  def tags(self):
+    if not hasattr(self, '_tags') or self._tags is None:
+      self._tags = rds.smembers(self.KEY_TAGS % self.id)
+    return self._tags
+
 
   def update_pin_tags(self, pin_id, add_tags=None, remove_tags=None):
     """
@@ -363,12 +368,12 @@ class User(BaseHash):
     p = rds.pipeline()
 
     if add_tags:
-      p.sadd(self.KEY_TAGS % self.id, add_tags)
+      p.sadd(self.KEY_TAGS % self.id, *list(add_tags))
       for tag in add_tags:
         p.sadd(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 
     if remove_tags:
-      p.srem(self.KEY_TAGS % self.id, remove_tags)
+      p.srem(self.KEY_TAGS % self.id, *list(remove_tags))
       for tag in remove_tags:
         p.srem(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 
