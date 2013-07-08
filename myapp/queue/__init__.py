@@ -1,6 +1,7 @@
 from pickle import loads, dumps
 from myapp import app, rds
 from uuid import uuid4
+from time import time
 
 _shared_tasks = {}
 
@@ -22,7 +23,7 @@ class DelayedResult(object):
     return rds.exists(self.key)
 
 
-def task(f):
+def queue_task(f):
 
   # key for shared tasks dict
   skey = '%s:%s' % (f.__module__, f.__name__)
@@ -42,6 +43,15 @@ def task(f):
 
   return f
 
+def set_tmp_param(s, ttl=300):
+  qkey = app.config['REDIS_QUEUE_KEY']
+  key = '%s:temp:%s' % (qkey, str(uuid4()))
+  rds.setex(key, ttl, s)
+  return key
+
+def get_tmp_param(key):
+  return rds.get(key)
+
 def queue_daemon(app, rv_ttl=500, daemon=False):
 
   
@@ -52,12 +62,16 @@ def queue_daemon(app, rv_ttl=500, daemon=False):
 
     if func:
 
-      print "Run %s.." % func.__name__
+      print "Run %s:%s..." % (func.__module__, func.__name__)
 
       try:
+        start = time()
         rv = func(*args, **kwargs)
+        end = time()
+        print "Done, time used = %s" % (end - start)
       except Exception, e:
         rv = e
+        print "Error, exception = %s" % e
       if rv is not None:
         rds.setex(key, rv_ttl, dumps(rv))
 
@@ -65,4 +79,6 @@ def queue_daemon(app, rv_ttl=500, daemon=False):
       print "Unable to find function %s" % skey
 
 from queue import tasks
+
+
 

@@ -55,16 +55,18 @@ def pins_import():
   Import pins from browser bookmarks export
   """
 
+  from core.pin import run_import_pins_task
+
   form = PinImportForm(request.form)
 
   if request.method == 'POST' and form.validate():
 
-    # TODO
-    f = form.bookmark_file.data
+    name = form.bookmark_file.name
+    f = request.files.get(name)
+
     if f:
       filedata = f.read()
-
-      count = 0
+      run_import_pins_task(filedata)
 
 
   context = make_context({ 'form': form })

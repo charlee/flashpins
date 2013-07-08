@@ -3,6 +3,8 @@ import logging
 import lxml.html
 from utils.crypt import urlhash
 from models import Link, User, Pin
+from core.user import current_user_id
+import tempfile
 
 
 log = logging.getLogger('core')
@@ -115,35 +117,12 @@ def remove_pin(pin_id):
     Pin.remove(pin_id)
 
 
+def run_import_pins_task(html_string):
 
-def import_pins(html_string):
-    """
-    Import all the links in a bookmark html.
-    """
-    
-    root = lxml.html.fromstring(html_string)
-    for t in root.iterlinks():
-        a = t[0]
+  from queue.tasks import import_pins_task
+  from queue import set_tmp_param
 
-        icon = a.get('icon', '')
-        url = a.get('href')
-        add_date = a.get('add_date')
+  key = set_tmp_param(html_string)
 
-        # tags property from delicious
-        tags = filter(None, a.get('tags', '').split(','))
-
-        # private property from delicious
-        private = (a.get('private', '0') != '0')
-            
-        title = a.text or ''
-
-        if url:
-
-            try:
-                ts = int(add_date)
-                d = datetime.fromtimestamp(ts, utc)
-            except:
-                d = datetime.utcnow().replace(tzinfo=utc)
-
-            yield(url, d, icon, title, tags, private)
+  import_pins_task.delay(current_user_id(), key)
 
