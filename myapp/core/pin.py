@@ -113,3 +113,37 @@ def remove_pin(pin_id):
 
     # remove pin
     Pin.remove(pin_id)
+
+
+
+def import_pins(html_string):
+    """
+    Import all the links in a bookmark html.
+    """
+    
+    root = lxml.html.fromstring(html_string)
+    for t in root.iterlinks():
+        a = t[0]
+
+        icon = a.get('icon', '')
+        url = a.get('href')
+        add_date = a.get('add_date')
+
+        # tags property from delicious
+        tags = filter(None, a.get('tags', '').split(','))
+
+        # private property from delicious
+        private = (a.get('private', '0') != '0')
+            
+        title = a.text or ''
+
+        if url:
+
+            try:
+                ts = int(add_date)
+                d = datetime.fromtimestamp(ts, utc)
+            except:
+                d = datetime.utcnow().replace(tzinfo=utc)
+
+            yield(url, d, icon, title, tags, private)
+

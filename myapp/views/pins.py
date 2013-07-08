@@ -7,7 +7,7 @@ from core.pin import new_pin
 from core.models import Pin, User, Link
 from myapp import app
 from utils.common import make_context, paginate
-from forms import PinAddForm
+from forms import PinAddForm, PinImportForm
 
 
 @app.route('/i/<link_id>')
@@ -60,7 +60,12 @@ def pins_import():
   if request.method == 'POST' and form.validate():
 
     # TODO
-    pass
+    f = form.bookmark_file.data
+    if f:
+      filedata = f.read()
+
+      count = 0
+
 
   context = make_context({ 'form': form })
   return render_template('pins/import.html', **context)

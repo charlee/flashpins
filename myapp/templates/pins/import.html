@@ -1,11 +1,12 @@
 {% extends 'users/settings-base.html' %}
+{% from "base/_formhelpers.html" import render_field %}
 
 {% block content %}
 
 <form class="form" method="POST" action="/settings/import" enctype="multipart/form-data">
-{% csrf_token %}
+<input type='hidden' name='_csrf_token' value="{{ csrf_token() }}">
 
-{{ form.as_p()|safe }}
+{{ render_field(form.bookmark_file)}}
 
 <input type="submit" class="btn btn-primary" value="Import" name="" />
 

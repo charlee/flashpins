@@ -34,7 +34,7 @@
               <li><button id="btn-pin" class="btn btn-primary">Pin!</button></li>
               {% endblock %}
               <li class="dropdown">
-                <a role="button" href="#" data-target="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.screen_name|default(user.email) }} <b class="caret"></b></a>
+                <a role="button" href="#" data-target="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.screen_name|default(user.email, True) }} <b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                   <li><a href="/settings">Settings</a></li>
                   <li><a href="/logout">Logout</a></li>
