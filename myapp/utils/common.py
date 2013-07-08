@@ -34,7 +34,7 @@ def paginate(size, page, page_size):
     total_page += 1
 
   # normalize current page number
-  if type(page) == str:
+  if type(page) == str or type(page) == unicode:
     if page.isdigit():
       page = int(page)
     else:
@@ -46,4 +46,4 @@ def paginate(size, page, page_size):
   start = page * page_size
   end = start + page_size if page < total_page else size
 
-  return start, end, total_page
+  return start, end, page, total_page

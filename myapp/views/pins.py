@@ -86,7 +86,7 @@ def me():
   # pagination
   page = request.args.get('p', 1)
 
-  (start, end, total_page) = paginate(pin_count, page, app.config['PAGE_SIZE'])
+  (start, end, page, total_page) = paginate(pin_count, page, app.config['PAGE_SIZE'])
 
 
   # get pins

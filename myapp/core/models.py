@@ -269,7 +269,7 @@ class Pin(BaseHash):
     return tags (list)
     """
     if not hasattr(self, '_tags') or self._tags is None:
-      self._tags = list(rds.smembers(self.KEY_TAGS % self.id))
+      self._tags = [ x.decode('utf-8') for x in list(rds.smembers(self.KEY_TAGS % self.id)) if type(x) == str ]
       self._tags.sort()
 
     return self._tags
@@ -402,7 +402,7 @@ class User(BaseHash):
       with_count: return (tag, count) tuple if True
     """
     if not hasattr(self, '_tags') or self._tags is None:
-      self._tags = list(rds.smembers(self.KEY_TAGS % self.id))
+      self._tags = [ x.decode('utf-8') for x in list(rds.smembers(self.KEY_TAGS % self.id)) if type(x) == str ]
       self._tags.sort()
 
     if with_count:

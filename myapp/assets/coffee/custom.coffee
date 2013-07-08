@@ -16,3 +16,11 @@ $(document).ready ->
   $("a.pin-save").click ->
     $("#pin-dialog").pinDialog("open", "pin", { id: parseInt($(@).attr("link_id")) })
     false
+
+  # replace pin url with short url
+  $(".pin a.pin_url").each ->
+    e = $(@)
+    e.click ->
+      e.attr("href", "/i/" + e.attr("link_id"))
+      true
+
