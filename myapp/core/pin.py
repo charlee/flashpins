@@ -126,3 +126,17 @@ def run_import_pins_task(html_string):
 
   import_pins_task.delay(current_user_id(), key)
 
+
+def fill_pins(pin_ids):
+  """
+  return a list of fully retrieved pins
+  """
+  pins = Pin.mget(pin_ids)
+
+  link_ids = [ pin.link_id for pin in pins ]
+  links = Link.mget(link_ids)
+
+  for pin, link in zip(pins, links):
+    pin.link = link
+
+  return pins

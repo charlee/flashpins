@@ -430,4 +430,14 @@ class User(BaseHash):
     p.execute()
 
 
+  def pins_in_tag(self, tag):
+    """
+    Find pins under tag
+    return sorted pin ids
+    """
+    pin_ids = list(rds.smembers(self.KEY_TAG_PINS % (self.id, tag)))
+    pin_ids.sort(reverse=True)
+
+    return pin_ids
+
 

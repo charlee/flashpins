@@ -3,7 +3,7 @@
 import re
 from flask import request, redirect, render_template, url_for, abort
 from core.user import require_login, current_user_id
-from core.pin import new_pin
+from core.pin import new_pin, fill_pins
 from core.models import Pin, User, Link
 from myapp import app
 from utils.common import make_context, paginate
@@ -88,16 +88,9 @@ def me():
 
   (start, end, page, total_page) = paginate(pin_count, page, app.config['PAGE_SIZE'])
 
-
   # get pins
   pin_ids = user_ref.pins(start, end)
-  pins = Pin.mget(pin_ids)
-
-  link_ids = [ pin.link_id for pin in pins ]
-  links = Link.mget(link_ids)
-
-  for pin, link in zip(pins, links):
-    pin.link = link
+  pins = fill_pins(pin_ids)
 
   # get my tags
   my_tags = user_ref.tags(with_count=True)
@@ -108,4 +101,36 @@ def me():
     'next_page': (page + 1) if (page < total_page) else 0,
     'my_tags': my_tags,
   })
+  return render_template('pins/me.html', **context)
+
+
+@app.route('/me/t/<tag>')
+@require_login()
+def my_tag_search(tag):
+  """
+  Tag search in current user's pins
+  """
+  user_ref = User.ref(current_user_id())
+  pin_ids = user_ref.pins_in_tag(tag)
+
+  # pagination
+  pin_count = len(pin_ids)
+
+  page = request.args.get('p', 1)
+  (start, end, page, total_page) = paginate(pin_count, page, app.config['PAGE_SIZE'])
+  pin_ids = pin_ids[start:end]
+
+  # get pins
+  pins = fill_pins(pin_ids)
+
+  # get my tags
+  my_tags = user_ref.tags(with_count=True)
+
+  context = make_context({
+    'pins': pins,
+    'prev_page': (page - 1) if (page > 1) else 0,
+    'next_page': (page + 1) if (page < total_page) else 0,
+    'my_tags': my_tags,
+  })
+
   return render_template('pins/me.html', **context)
