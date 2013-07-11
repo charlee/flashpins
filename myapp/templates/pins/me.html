@@ -32,7 +32,10 @@
     <img src="{{ pin.link.icon }}" />
     {% endif %}
     <strong><a class="pin_url" href="{{ pin.link.url }}" link_id="{{ pin.link.id }}" target="_blank">{{ pin.title|default(pin.link.title, true) }}</a></strong>
-    <small><a href="#" class="pin-edit" pin_id="{{ pin.id }}">edit this</a></small>
+    <span class="pin-meta">
+      <small><a href="#" class="pin-edit" pin_id="{{ pin.id }}">edit this</a></small>
+      <small><a href="#" class="pin-delete" pin_id="{{ pin.id }}">delete</a></small>
+    </span>
   </div>
 
   <div class="pin-date pull-left"><small>{{ pin.link.add_date }}</small></div>

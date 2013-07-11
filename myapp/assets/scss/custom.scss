@@ -97,14 +97,23 @@ body {
 }
 
 
-.pin-edit, .pin-save {
+.pin-meta {
   margin-left: 10px;
+}
+
+.pin-edit, .pin-save, .pin-delete {
   color: #bbb;
+  padding: 1px 2px;
 
   &:hover {
     color: #666;
     text-decoration: none;
   }
+}
+
+.pin-delete:hover {
+  background-color: #f00;
+  color: #fff;
 }
 
 .user-dialog.modal {

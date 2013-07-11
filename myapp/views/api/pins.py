@@ -68,5 +68,5 @@ def pin_destroy(pin_id):
 
   remove_pin(pin_id)
 
-  return make_response('', 204)
+  return ''
 

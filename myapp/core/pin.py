@@ -104,10 +104,11 @@ def remove_pin(pin_id):
 
   if pin:
 
-    # remove user ref
+    # remove from user
     user_ref = User.ref(pin.user_id)
     user_ref.remove_pin(pin_id)
     user_ref.remove_link(pin.link_id)
+    user_ref.update_pin_tags(pin.id, remove_tags=pin.tags())
 
     # decrease link counter
     link_ref = Link.ref(pin.link_id)

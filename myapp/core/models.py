@@ -430,11 +430,15 @@ class User(BaseHash):
         p.sadd(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 
     if remove_tags:
-      p.srem(self.KEY_TAGS % self.id, *remove_tags)
       for tag in remove_tags:
         p.srem(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 
     p.execute()
+
+    # see if necessary to remove any tags
+    empty_tags = [ tag for tag in remove_tags if rds.scard(self.KEY_TAG_PINS % (self.id, tag)) == 0 ]
+    if empty_tags:
+      rds.srem(self.KEY_TAGS % self.id, *empty_tags)
 
 
   def pins_in_tag(self, tag):

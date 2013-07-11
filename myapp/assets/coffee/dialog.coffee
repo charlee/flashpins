@@ -195,6 +195,55 @@ $.widget 'idv2.pinDialog', $.idv2.baseDialog,
 
       
 
+##
+# pin dialog
+#
+$.widget 'idv2.pinDeleteDialog', $.idv2.baseDialog,
+
+  _create: ->
+
+    @_super()
+
+    # dialog frame
+    @dialog.addClass("pin-dialog")
+
+    @title.html("Delete Pin")
+
+    # dialog body elements
+    $("<div>").html("Are you sure to delete this pin?").appendTo(@body)
+
+    # dialog footer
+    $("<button>").addClass("btn").html("Cancel").appendTo(@footer).click =>
+      @close()
+
+    $("<button>").addClass("btn btn-danger").html("Delete").appendTo(@footer).click =>
+      @remove()
+
+  ##
+  # open dialog
+  #
+  open: (data) ->
+
+    @pinId = data.id
+
+    @_super()
+
+
+  ##
+  # delete pin
+  #
+  remove: ->
+    
+    $.ajax '/j/pins/' + parseInt(@pinId),
+      type: 'DELETE'
+      contentType: 'application/json'
+      success: =>
+        @close()
+        location.reload()
+
+
+
+
 
 
 
