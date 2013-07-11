@@ -26,7 +26,7 @@
 {% for pin in pins %}
 
 <div class="pin">
-  <div class="pin-count pull-right"><span class="badge badge-info">{{ pin.link.pin_count }}</span>people</div>
+  <div class="pin-count pull-right"><span class="badge badge-info">{{ pin.link.pin_count() }}</span>people</div>
   <div class="pin-title clearfix">
     {% if pin.link.icon %}
     <img src="{{ pin.link.icon }}" />

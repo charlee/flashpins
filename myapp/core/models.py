@@ -200,8 +200,8 @@ class BaseHash:
 
 class Link(BaseHash):
 
-  KEY_PINNED_COUNT = 'fp:link:%s:pinned_count'
-  KEY_VIEWED_COUNT = 'fp:link:%s:viewed_count'
+  KEY_PIN_COUNT = 'fp:link:%s:pinned_count'
+  KEY_VIEW_COUNT = 'fp:link:%s:viewed_count'
 
   fields = {
     'title': '',
@@ -210,22 +210,29 @@ class Link(BaseHash):
     'add_date': 0,
   }
 
+  def pin_count(self):
+    return rds.get(self.KEY_PIN_COUNT % self.id)
 
-  def inc_pinned_count(self):
-    rds.incr(self.KEY_PINNED_COUNT % self.id)
+
+  def view_count(self):
+    return rds.get(self.KEY_VIEW_COUNT% self.id)
 
 
-  def dec_pinned_count(self):
+  def inc_pin_count(self):
+    rds.incr(self.KEY_PIN_COUNT % self.id)
+
+
+  def dec_pin_count(self):
     # TODO: make sure counter >= 0
-    rds.decr(self.KEY_PINNED_COUNT % self.id)
+    rds.decr(self.KEY_PIN_COUNT % self.id)
     
 
-  def inc_viewed_count(self):
-    rds.incr(self.KEY_VIEWED_COUNT % self.id)
+  def inc_view_count(self):
+    rds.incr(self.KEY_VIEW_COUNT % self.id)
 
 
-  def dec_viewed_count(self):
-    rds.dec(self.KEY_VIEWED_COUNT % self.id)
+  def dec_view_count(self):
+    rds.dec(self.KEY_VIEW_COUNT % self.id)
 
 
   @classmethod
@@ -236,7 +243,7 @@ class Link(BaseHash):
     super(Link, cls).remove(id)
 
     # clear the counters
-    p.delete(cls.KEY_PINNED_COUNT % id, cls.KEY_VIEWED_COUNT % id)
+    p.delete(cls.KEY_PIN_COUNT % id, cls.KEY_VIEW_COUNT % id)
     
 
       

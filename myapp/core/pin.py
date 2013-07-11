@@ -35,7 +35,7 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
     user_ref.add_link(link_id)
 
     # increase link's pinned count
-    link.inc_pinned_count()
+    link.inc_pin_count()
 
     # add tags to pin
     if tags:
@@ -111,7 +111,7 @@ def remove_pin(pin_id):
 
     # decrease link counter
     link_ref = Link.ref(pin.link_id)
-    link_ref.dec_pinned_count()
+    link_ref.dec_pin_count()
 
     # remove pin
     Pin.remove(pin_id)

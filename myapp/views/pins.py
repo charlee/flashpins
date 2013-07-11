@@ -22,6 +22,9 @@ def extract_url(link_id):
   if not link:
     abort(404)
 
+  # record this access
+  link.inc_view_count()
+
   return redirect(link.url)
 
 @app.route('/p/add', methods=['POST', 'GET'])
