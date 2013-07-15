@@ -43,6 +43,9 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
       pin_ref.update_tags(tags)
       user_ref.update_pin_tags(pin_id, tags)
 
+      # update link pin
+      link.accumulate_tags(tags)
+
     return pin_id
 
   else:

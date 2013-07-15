@@ -79,7 +79,8 @@ class BaseHash:
 
   def __repr__(self):
     keys = self.fields.keys()
-    values = [getattr(self, key).encode('utf-8') for key in keys]
+    values = [getattr(self, key) for key in keys]
+    values = [ x.encode('utf-8') if x is not None else None for x in values ]
     attrs = ', '.join('%s=%s' % pair for pair in zip(keys, values))
 
     return "<%s: id=%s, %s>" % (self.__class__.__name__, self.id, attrs)
@@ -202,6 +203,8 @@ class Link(BaseHash):
 
   KEY_PIN_COUNT = 'fp:link:%s:pinned_count'
   KEY_VIEW_COUNT = 'fp:link:%s:viewed_count'
+  KEY_TAG_POOL = 'fp:link:%s:tag_pool'
+  KEY_TAGS = 'fp:link:%s:tags'
 
   fields = {
     'title': '',
@@ -233,6 +236,34 @@ class Link(BaseHash):
 
   def dec_view_count(self):
     rds.dec(self.KEY_VIEW_COUNT % self.id)
+
+  def accumulate_tags(self, tags):
+    """
+    Accumulate tags to the link's tag pool
+    """
+
+    # set the tag counter
+    p = rds.pipeline()
+    for tag in tags:
+      p.zincrby(self.KEY_TAG_POOL % self.id, 1)
+    p.execute()
+
+    # cache the top 5 tags
+    self._tags = rds.zrange(self.KEY_TAG_POOL % self.id, 0, 5)
+    p = rds.pipeline()
+    p.delete(self.KEY_TAGS % self.id)
+    p.sadd(self.KEY_TAGS % self.id, *tags)
+    p.execute()
+
+
+  def tags(self):
+    """
+    Get popular tags for this link
+    return a list sorted by popularity
+    """
+    if not hasattr(self, '_tags') or self._tags is None:
+      self._tags = [ x.decode('utf-8') for x in list(rds.smembers(self.KEY_TAGS % self.id)) if type(x) == str ]
+    return self._tags
 
 
   @classmethod
@@ -436,9 +467,10 @@ class User(BaseHash):
     p.execute()
 
     # see if necessary to remove any tags
-    empty_tags = [ tag for tag in remove_tags if rds.scard(self.KEY_TAG_PINS % (self.id, tag)) == 0 ]
-    if empty_tags:
-      rds.srem(self.KEY_TAGS % self.id, *empty_tags)
+    if remove_tags:
+      empty_tags = [ tag for tag in remove_tags if rds.scard(self.KEY_TAG_PINS % (self.id, tag)) == 0 ]
+      if empty_tags:
+        rds.srem(self.KEY_TAGS % self.id, *empty_tags)
 
 
   def pins_in_tag(self, tag):
