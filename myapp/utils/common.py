@@ -43,7 +43,7 @@ def paginate(size, page, page_size):
   if page > total_page: page = total_page
 
   # output
-  start = page * page_size
+  start = (page - 1) * page_size
   end = start + page_size if page < total_page else size
 
   return start, end, page, total_page
