@@ -484,3 +484,9 @@ class User(BaseHash):
     return pin_ids
 
 
+class Tag(object):
+
+  KEY_LINKS = 'fp:tags:%s:links'        # sorted set for link ids (pinned_count -> score)
+  KEY_POPULAR_TAGS = 'fp:tags:popular'  # sorted set for tags
+  
+
