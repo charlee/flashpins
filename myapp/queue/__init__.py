@@ -2,6 +2,7 @@ from pickle import loads, dumps
 from myapp import app, rds
 from uuid import uuid4
 from time import time
+import traceback
 
 _shared_tasks = {}
 
@@ -72,6 +73,7 @@ def queue_daemon(app, rv_ttl=500, daemon=False):
       except Exception, e:
         rv = e
         print "Error, exception = %s" % e
+        traceback.print_exc()
       if rv is not None:
         rds.setex(key, rv_ttl, dumps(rv))
 

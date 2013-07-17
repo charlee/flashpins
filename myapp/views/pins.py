@@ -96,7 +96,7 @@ def me():
   pins = fill_pins(pin_ids)
 
   # get my tags
-  my_tags = user_ref.tags(with_count=True)
+  my_tags = user_ref.tags(with_count=True, total=50)
 
   context = make_context({
     'pins': pins,

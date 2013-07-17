@@ -245,7 +245,7 @@ class Link(BaseHash):
     # set the tag counter
     p = rds.pipeline()
     for tag in tags:
-      p.zincrby(self.KEY_TAG_POOL % self.id, 1)
+      p.zincrby(self.KEY_TAG_POOL % self.id, tag, 1)
     p.execute()
 
     # cache the top 5 tags
@@ -280,8 +280,6 @@ class Link(BaseHash):
       
 class Pin(BaseHash):
 
-  KEY_TAGS = 'fp:pin:%s:tags'
-
   fields = {
     'title': '',
     'desc': '',
@@ -289,40 +287,23 @@ class Pin(BaseHash):
     'user_id': 0,
     'add_date': 0,
     'private': 0,
+    'taglist': '',       # comma (,) separated tag list
   }
 
-  def update_tags(self, add_tags=None, remove_tags=None):
-    """
-    Add or remove tags to current pin
-    """
-    if add_tags:
-      rds.sadd(self.KEY_TAGS % self.id, *add_tags)
-
-    if remove_tags:
-      rds.srem(self.KEY_TAGS % self.id, *remove_tags)
-      
 
   def tags(self):
     """
     return tags (list)
     """
-    if not hasattr(self, '_tags') or self._tags is None:
-      self._tags = [ x.decode('utf-8') for x in list(rds.smembers(self.KEY_TAGS % self.id)) if type(x) == str ]
-      self._tags.sort()
-
-    return self._tags
-
+    if self.taglist is not None:
+      return sorted(filter(None, self.taglist.split(',')))
+    else:
+      return []
 
   def as_hash(self):
     h = super(Pin, self).as_hash()
     h['tags'] = self.tags()
     return h
-
-
-  @classmethod
-  def remove(cls, id):
-    super(Pin, cls).remove(id)
-    rds.delete(cls.KEY_TAGS % id)
 
 
 class User(BaseHash):
@@ -434,19 +415,24 @@ class User(BaseHash):
     return rds.sismember(self.KEY_LINKS % self.id, link_id)
 
 
-  def tags(self, with_count=False):
+  def tags(self, with_count=True, total=None):
     """
     Get user's tags (list)
       with_count: return (tag, count) tuple if True
+      total: retrieve max "total" tags
     """
-    if not hasattr(self, '_tags') or self._tags is None:
-      self._tags = [ x.decode('utf-8') for x in list(rds.smembers(self.KEY_TAGS % self.id)) if type(x) == str ]
-      self._tags.sort()
+
+    if total is None:
+      total = rds.zcard(self.KEY_TAGS % self.id)
+
+    tags = rds.zrevrange(self.KEY_TAGS % self.id, 0, total-1, withscores=True, score_cast_func=int)
 
     if with_count:
-      return [ (tag, rds.scard(self.KEY_TAG_PINS % (self.id, tag))) for tag in self._tags ]
+      tags = [ (t.decode('utf-8'), s) for t, s in tags ]
     else:
-      return self._tags
+      tags = [ t.decode('utf-8') for t, s in tags ]
+
+    return tags
 
 
   def update_pin_tags(self, pin_id, add_tags=None, remove_tags=None):
@@ -456,21 +442,16 @@ class User(BaseHash):
     p = rds.pipeline()
 
     if add_tags:
-      p.sadd(self.KEY_TAGS % self.id, *add_tags)
       for tag in add_tags:
+        p.zincrby(self.KEY_TAGS % self.id, tag, 1)
         p.sadd(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 
     if remove_tags:
+      p.zremrangebyscore(self.KEY_TAGS % self.id, 0, 0)
       for tag in remove_tags:
         p.srem(self.KEY_TAG_PINS % (self.id, tag), pin_id)
 
     p.execute()
-
-    # see if necessary to remove any tags
-    if remove_tags:
-      empty_tags = [ tag for tag in remove_tags if rds.scard(self.KEY_TAG_PINS % (self.id, tag)) == 0 ]
-      if empty_tags:
-        rds.srem(self.KEY_TAGS % self.id, *empty_tags)
 
 
   def pins_in_tag(self, tag):

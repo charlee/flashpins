@@ -2,7 +2,8 @@
 
 import os
 import redis
-from flask import Flask, render_template
+import time
+from flask import Flask, render_template, g
 from flask.ext.scss import Scss
 from flask.ext.csrf import csrf
 from flask.ext.bcrypt import Bcrypt
@@ -43,3 +44,13 @@ def not_found(error):
   return render_template('404.html'), 404
 
 
+@app.before_request
+def start_profile():
+  g.start = time.time()
+
+
+@app.after_request
+def end_profile(response):
+  diff = time.time() - g.start
+  response.headers.add('X-Page-Time', str(diff))
+  return response

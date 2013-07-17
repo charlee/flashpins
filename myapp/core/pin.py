@@ -28,7 +28,7 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
   if not user_ref.has_link(link_id):
     
     # not pinned yet, pin it
-    pin_id = Pin.new(link_id=link_id, user_id=user_id, title=title, desc=desc, add_date=add_date, private=(1 if private else 0))
+    pin_id = Pin.new(link_id=link_id, user_id=user_id, taglist=','.join(tags), title=title, desc=desc, add_date=add_date, private=(1 if private else 0))
 
     # add pin & link references to user
     user_ref.add_pin(pin_id)
@@ -40,7 +40,6 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
     # add tags to pin
     if tags:
       pin_ref = Pin.ref(pin_id)
-      pin_ref.update_tags(tags)
       user_ref.update_pin_tags(pin_id, tags)
 
       # update link pin
@@ -66,6 +65,7 @@ def update_pin(pin_id, title=None, desc=None, tags=None, private=None):
   if title is not None: params['title'] = title
   if desc is not None: params['desc'] = desc
   if private is not None: params['private'] = 1 if private else 0
+  if tags is not None: params['taglist'] = ','.join(tags)
 
   # update pin
   pin_ref = Pin.ref(pin_id)
@@ -83,7 +83,6 @@ def update_pin(pin_id, title=None, desc=None, tags=None, private=None):
     added_tags = list(new_tags - old_tags)
     removed_tags = list(old_tags - new_tags)
 
-    pin_ref.update_tags(added_tags, removed_tags)
     user_ref.update_pin_tags(pin_id, added_tags, removed_tags)
 
 

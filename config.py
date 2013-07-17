@@ -18,7 +18,7 @@ REDIS_PASSWORD = None
 #SCSS_ASSET_DIR =
 
 # for views paging
-PAGE_SIZE = 50
+PAGE_SIZE = 20
 
 # for queue service
 REDIS_QUEUE_KEY = 'fp:queue'

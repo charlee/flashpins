@@ -47,3 +47,11 @@ def paginate(size, page, page_size):
   end = start + page_size if page < total_page else size
 
   return start, end, page, total_page
+
+
+def score_list(l):
+  """
+  Add score "1" to each element of the list.
+  Used by redis.ZADD
+  """
+  return [ x for y in l for x in (1, y) ]
