@@ -78,6 +78,14 @@ class BaseHash:
 
       setattr(self, field, v)
 
+
+  @classmethod
+  def seq(cls):
+    """
+    Get current sequence number
+    """
+    return rds.get(cls.KEY_INCR)
+
   def __repr__(self):
     keys = self.fields.keys()
     values = [getattr(self, key) for key in keys]
@@ -210,6 +218,9 @@ class Link(BaseHash):
   # reverse lookup from hash to link id
   GKEY_HASH_REF = 'fp:g:link:hash_ref'
 
+  # recent 5000 links
+  GKEY_RECENT_LINKS = 'fp:g:link:recent'
+
   fields = {
     'title': '',
     'url': '',
@@ -292,7 +303,26 @@ class Link(BaseHash):
 
     # clear the counters
     p.delete(cls.KEY_PIN_COUNT % id, cls.KEY_VIEW_COUNT % id)
+
+
+  @classmethod
+  def generate_recent_links(cls):
+    """
+    Generate recent links.
+    Run in cronjob.
+    """
+    max_id = int(cls.seq() or 0)
+    prev_max_id = int(rds.lindex(cls.GKEY_RECENT_LINKS, 0) or 0)
     
+    for link_id in range(prev_max_id + 1, max_id + 1):
+      if cls.exists(link_id):
+        rds.lpush(cls.GKEY_RECENT_LINKS, link_id)
+    
+    rds.ltrim(cls.GKEY_RECENT_LINKS, 0, 5000)
+
+  @classmethod
+  def recent_links(cls, start=0, stop=5000):
+    return rds.lrange(cls.GKEY_RECENT_LINKS, start, stop) or []
 
       
 class Pin(BaseHash):
@@ -482,9 +512,9 @@ class User(BaseHash):
     return pin_ids
 
 
-class Tag(object):
+class Global(object):
 
   KEY_LINKS = 'fp:tags:%s:links'        # sorted set for link ids (pinned_count -> score)
   KEY_POPULAR_TAGS = 'fp:tags:popular'  # sorted set for tags
-  
+
 

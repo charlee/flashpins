@@ -3,7 +3,7 @@
 from flask import render_template, session
 from myapp import app
 from core.user import current_user_id
-from core.models import User
+from core.models import User, Link
 
 from utils.common import make_context
 
@@ -17,13 +17,10 @@ app.register_blueprint(api_pins, url_prefix='/j/pins')
 @app.route('/')
 def index():
 
-  user_id = current_user_id()
-  if user_id:
-    user = User.get(user_id)
-  else:
-    user = None
+  link_ids = Link.recent_links()
+  links = Link.mget(link_ids)
 
-  context = make_context({})
+  context = make_context({ 'links': links })
 
   return render_template('index.html', **context)
 

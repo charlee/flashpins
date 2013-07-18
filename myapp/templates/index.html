@@ -3,11 +3,11 @@
 {% block content %}
 {% if user %}
 
-<h3>Popular Links</h3>
-{% for link in popular_links %}
+<h3>Recent Links</h3>
+{% for link in links %}
 
 <div class="pin">
-  <div class="pin-count pull-right"><span class="badge badge-info">{{ link.pin_count }}</span>people</div>
+  <div class="pin-count pull-right"><span class="badge badge-info">{{ link.pin_count() }}</span>people</div>
   <div class="pin-title clearfix">
     {% if link.icon %}
     <img src="{{ link.icon }}" />
@@ -21,7 +21,12 @@
   </div>
 
   <div class="pin-date pull-left"><small>{{ link.add_date }}</small></div>
-  <div class="pin-tags clearfix"></div>
+  <div class="pin-tags pull-left">
+  {% for tag in link.tags() %}
+    <span class="pin-tag label"><a href="/t/{{ tag }}">{{ tag }}</a></span>
+  {% endfor %}
+  </div>
+  <div class="clearfix"></div>
 
 </div>
 
