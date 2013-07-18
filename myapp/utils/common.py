@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
 
-from core.models import User
-from core.user import current_user_id
+from myapp.core.models import User
+from myapp.core.user import current_user_id
 
 def make_context(params):
     

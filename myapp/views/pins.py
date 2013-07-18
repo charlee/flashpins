@@ -2,11 +2,11 @@
 
 import re
 from flask import request, redirect, render_template, url_for, abort
-from core.user import require_login, current_user_id
-from core.pin import new_pin, fill_pins
-from core.models import Pin, User, Link
 from myapp import app
-from utils.common import make_context, paginate
+from myapp.core.user import require_login, current_user_id
+from myapp.core.pin import new_pin, fill_pins
+from myapp.core.models import Pin, User, Link
+from myapp.utils.common import make_context, paginate
 from forms import PinAddForm, PinImportForm
 
 

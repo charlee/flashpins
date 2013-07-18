@@ -1,9 +1,11 @@
+# -*- coding: utf8 -*-
+
 from myapp import app
 from flask import Blueprint, request, jsonify, abort, make_response
-from core.user import j_require_login, current_user_id
-from core.pin import new_pin, remove_pin, update_pin
-from core.models import Pin, Link
 from flask.ext.csrf import csrf_exempt
+from myapp.core.user import j_require_login, current_user_id
+from myapp.core.pin import new_pin, remove_pin, update_pin
+from myapp.core.models import Pin, Link
 
 api_pins = Blueprint('api_pins', __name__)
 

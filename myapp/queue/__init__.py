@@ -1,8 +1,9 @@
+import traceback
 from pickle import loads, dumps
-from myapp import app, rds
 from uuid import uuid4
 from time import time
-import traceback
+
+from myapp import app, rds
 
 _shared_tasks = {}
 
@@ -80,7 +81,7 @@ def queue_daemon(app, rv_ttl=500, daemon=False):
     else:
       print "Unable to find function %s" % skey
 
-from queue import tasks
+from . import tasks
 
 
 

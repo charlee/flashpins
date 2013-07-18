@@ -4,7 +4,7 @@ import functools
 from flask import session, request, redirect, url_for
 from myapp import bcrypt
 
-from core.models import User
+from .models import User
 
 def require_login():
   """

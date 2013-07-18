@@ -2,15 +2,15 @@
 
 from flask import render_template, session
 from myapp import app
-from core.user import current_user_id
-from core.models import User, Link
+from myapp.core.user import current_user_id
+from myapp.core.models import User, Link
 
-from utils.common import make_context
+from myapp.utils.common import make_context
 
 import pins
 import users
 
-from views.api.pins import api_pins
+from .api.pins import api_pins
 
 app.register_blueprint(api_pins, url_prefix='/j/pins')
 

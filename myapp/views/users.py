@@ -2,9 +2,9 @@
 
 from flask import render_template, request, redirect, url_for
 from myapp import app
-from core.user import new_user, update_password, current_user_id, require_login, authenticate, login as user_login, logout as user_logout
-from core.models import User
-from utils.common import make_context
+from myapp.core.user import new_user, update_password, current_user_id, require_login, authenticate, login as user_login, logout as user_logout
+from myapp.core.models import User
+from myapp.utils.common import make_context
 
 from forms import LoginForm, RegisterForm, SettingsAccountForm, SettingsProfileForm
 

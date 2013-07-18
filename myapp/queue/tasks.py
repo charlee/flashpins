@@ -2,8 +2,9 @@ from . import queue_task, get_tmp_param
 
 import lxml
 from datetime import datetime
-from core.models import User, Pin, Link
-from core.pin import new_pin
+
+from myapp.core.models import User, Pin, Link
+from myapp.core.pin import new_pin
 
 
 @queue_task

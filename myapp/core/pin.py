@@ -1,11 +1,11 @@
 import logging
-
-import lxml.html
-from utils.crypt import urlhash
-from models import Link, User, Pin
-from core.user import current_user_id
 import tempfile
 import time
+import lxml.html
+
+from myapp.utils.crypt import urlhash
+from .models import Link, User, Pin
+from .user import current_user_id
 
 
 log = logging.getLogger('core')

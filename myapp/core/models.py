@@ -17,7 +17,7 @@ Define common ops for data models
 
 import re
 from myapp import rds 
-from utils.crypt import urlhash
+from myapp.utils.crypt import urlhash
 
 # Link
 

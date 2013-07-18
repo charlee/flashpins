@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 import hashlib
-from utils import base62_encode
+from . import base62_encode
 
 def urlhash(url):
     m = hashlib.sha1()
