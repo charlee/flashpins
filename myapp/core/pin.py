@@ -5,6 +5,7 @@ from utils.crypt import urlhash
 from models import Link, User, Pin
 from core.user import current_user_id
 import tempfile
+import time
 
 
 log = logging.getLogger('core')
@@ -15,7 +16,7 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
   New pin
   return None if already pinned this
   """
-  link_id = get_link_id(url, title=title, icon=icon, add_date=add_date)
+  link_id = get_link_id(url, title=title, icon=icon, add_date=add_date, tags=tags)
 
   # get the link tilte to check if user changed the title
   link = Link.get(link_id, ['title'])
@@ -41,9 +42,6 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
     if tags:
       pin_ref = Pin.ref(pin_id)
       user_ref.update_pin_tags(pin_id, tags)
-
-      # update link pin
-      link.accumulate_tags(tags)
 
     return pin_id
 
@@ -86,12 +84,21 @@ def update_pin(pin_id, title=None, desc=None, tags=None, private=None):
     user_ref.update_pin_tags(pin_id, added_tags, removed_tags)
 
 
-def get_link_id(url, title='', icon='', add_date=None):
+def get_link_id(url, title='', icon='', add_date=None, tags=[]):
 
   link_id = urlhash(url)
 
+  now_ts = int(time.time())
+
   if not Link.exists(link_id):
-    link_id = Link.new(id=link_id, title=title, url=url, icon=icon, add_date=add_date)
+    link_id = Link.new(id=link_id, title=title, url=url, icon=icon, add_date=add_date, access_date=now_ts)
+
+  else:
+    link_ref = Link.ref(id=link_id)
+    link_ref.update(access_date=now_ts)
+
+  link_ref = Link.ref(id=link_id)
+  link_ref.accumulate_tags(tags)
 
   return link_id
 

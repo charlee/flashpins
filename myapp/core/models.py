@@ -17,6 +17,7 @@ Define common ops for data models
 
 import re
 from myapp import rds 
+from utils.crypt import urlhash
 
 # Link
 
@@ -211,6 +212,7 @@ class Link(BaseHash):
     'url': '',
     'icon': '',
     'add_date': 0,
+    'access_date': 0,
   }
 
   def pin_count(self):
@@ -249,6 +251,7 @@ class Link(BaseHash):
     p.execute()
 
     # cache the top 5 tags
+    # TODO: this should be moved into cron job
     self._tags = rds.zrange(self.KEY_TAG_POOL % self.id, 0, 5)
     p = rds.pipeline()
     p.delete(self.KEY_TAGS % self.id)
