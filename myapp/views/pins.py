@@ -10,14 +10,15 @@ from utils.common import make_context, paginate
 from forms import PinAddForm, PinImportForm
 
 
-@app.route('/i/<link_id>')
-def extract_url(link_id):
+@app.route('/i/<link_hash>')
+def extract_url(link_hash):
   """
   Short url service
   """
-  if not re.match(r'\w+', link_id):
+  if not re.match(r'\w+', link_hash):
     abort(404)
 
+  link_id = Link.get_by_hash(link_hash)
   link = Link.get(link_id, fields=['url'])
   if not link:
     abort(404)

@@ -207,10 +207,14 @@ class Link(BaseHash):
   KEY_TAG_POOL = 'fp:link:%s:tag_pool'
   KEY_TAGS = 'fp:link:%s:tags'
 
+  # reverse lookup from hash to link id
+  GKEY_HASH_REF = 'fp:g:link:hash_ref'
+
   fields = {
     'title': '',
     'url': '',
     'icon': '',
+    'hash': '',
     'add_date': 0,
     'access_date': 0,
   }
@@ -258,6 +262,10 @@ class Link(BaseHash):
     p.sadd(self.KEY_TAGS % self.id, *tags)
     p.execute()
 
+  @classmethod
+  def get_by_hash(cls, h):
+    return rds.hget(cls.GKEY_HASH_REF, h)
+
 
   def tags(self):
     """
@@ -267,6 +275,12 @@ class Link(BaseHash):
     if not hasattr(self, '_tags') or self._tags is None:
       self._tags = [ x.decode('utf-8') for x in list(rds.smembers(self.KEY_TAGS % self.id)) if type(x) == str ]
     return self._tags
+
+  @classmethod
+  def new(cls, hash, **kwargs):
+    link_id = super(Link, cls).new(id=None, hash=hash, **kwargs)
+    rds.hset(cls.GKEY_HASH_REF, hash, link_id)
+    return link_id
 
 
   @classmethod

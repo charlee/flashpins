@@ -86,12 +86,13 @@ def update_pin(pin_id, title=None, desc=None, tags=None, private=None):
 
 def get_link_id(url, title='', icon='', add_date=None, tags=[]):
 
-  link_id = urlhash(url)
+  link_hash = urlhash(url)
+  link_id = Link.get_by_hash(link_hash)
 
   now_ts = int(time.time())
 
-  if not Link.exists(link_id):
-    link_id = Link.new(id=link_id, title=title, url=url, icon=icon, add_date=add_date, access_date=now_ts)
+  if not link_id:
+    link_id = Link.new(hash=link_hash, title=title, url=url, icon=icon, add_date=add_date, access_date=now_ts)
 
   else:
     link_ref = Link.ref(id=link_id)

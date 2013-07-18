@@ -15,7 +15,7 @@ $(document).ready ->
 
   # save an existing link to pin
   $("a.pin-save").click ->
-    $("#pin-dialog").pinDialog("open", "pin", { id: parseInt($(@).attr("link_id")) })
+    $("#pin-dialog").pinDialog("open", "pin", { id: parseInt($(@).attr("link_hash")) })
     false
 
   # delete a pin
@@ -27,6 +27,6 @@ $(document).ready ->
   $(".pin a.pin_url").each ->
     e = $(@)
     e.click ->
-      e.attr("href", "/i/" + e.attr("link_id"))
+      e.attr("href", "/i/" + e.attr("link_hash"))
       true
 
