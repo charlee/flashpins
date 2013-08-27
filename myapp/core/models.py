@@ -259,19 +259,21 @@ class Link(BaseHash):
     Accumulate tags to the link's tag pool
     """
 
-    # set the tag counter
-    p = rds.pipeline()
-    for tag in tags:
-      p.zincrby(self.KEY_TAG_POOL % self.id, tag, 1)
-    p.execute()
+    if tags:
 
-    # cache the top 5 tags
-    # TODO: this should be moved into cron job
-    self._tags = rds.zrange(self.KEY_TAG_POOL % self.id, 0, 5)
-    p = rds.pipeline()
-    p.delete(self.KEY_TAGS % self.id)
-    p.sadd(self.KEY_TAGS % self.id, *tags)
-    p.execute()
+      # set the tag counter
+      p = rds.pipeline()
+      for tag in tags:
+        p.zincrby(self.KEY_TAG_POOL % self.id, tag, 1)
+      p.execute()
+
+      # cache the top 5 tags
+      # TODO: this should be moved into cron job
+      self._tags = rds.zrange(self.KEY_TAG_POOL % self.id, 0, 5)
+      p = rds.pipeline()
+      p.delete(self.KEY_TAGS % self.id)
+      p.sadd(self.KEY_TAGS % self.id, *tags)
+      p.execute()
 
   @classmethod
   def get_by_hash(cls, h):
