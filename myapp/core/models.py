@@ -272,7 +272,8 @@ class Link(BaseHash):
       self._tags = rds.zrange(self.KEY_TAG_POOL % self.id, 0, 5)
       p = rds.pipeline()
       p.delete(self.KEY_TAGS % self.id)
-      p.sadd(self.KEY_TAGS % self.id, *tags)
+      for tag in tags:
+        p.sadd(self.KEY_TAGS % self.id, tag)
       p.execute()
 
   @classmethod
