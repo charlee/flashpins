@@ -45,3 +45,5 @@ nosetests.xml
 myapp/static/js/*.js
 myapp/static/css/*.css
 
+logs
+nohup.out

@@ -130,8 +130,8 @@ def remove_pin(pin_id):
 
 def run_import_pins_task(html_string):
 
-  from queue.tasks import import_pins_task
-  from queue import set_tmp_param
+  from myapp.queue.tasks import import_pins_task
+  from myapp.queue import set_tmp_param
 
   key = set_tmp_param(html_string)
 

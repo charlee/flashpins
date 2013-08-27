@@ -59,7 +59,7 @@ def pins_import():
   Import pins from browser bookmarks export
   """
 
-  from core.pin import run_import_pins_task
+  from myapp.core.pin import run_import_pins_task
 
   form = PinImportForm(request.form)
 
