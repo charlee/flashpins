@@ -50,6 +50,26 @@ def add():
   return render_template('pins/add.html', **context)
 
 
+@app.route('/add', methods=['POST', 'GET'])
+def bookmarklet_add():
+  """
+  Add pin with bookmarklet
+  """
+  form = PinAddForm(request.form)
+
+  if request.method == 'POST' and form.validate():
+    title = form.title.data or ''
+    url = form.url.data or ''
+    desc = form.desc.data or ''
+
+    new_pin(url=url, user_id=current_user_id(), title=title, desc=desc)
+
+    return render_template('pins/bookmarklet_add_ok.html')
+
+  context = make_context({ 'form': form })
+  return render_template('pins/bookmarklet_add.html', **context)
+
+
 
 
 @app.route('/settings/import', methods=['POST', 'GET'])
