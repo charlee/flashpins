@@ -1,20 +1,46 @@
 {% extends 'base/base.html' %}
-{% from "base/_formhelpers.html" import render_field %}
 
-{% block content %}
+{% block header %}
+<link rel="stylesheet" href="/static/css/bookmarklet.css" />
+<script>
+$(document).ready(function() {
+  $("#tags").tagtag();
+  $("#cancel").click(function() { window.close(); });
+});
+</script>
+{% endblock %}
 
-<form class="form" method="POST" action="/p/add">
+{% block nav %}
+{% endblock %}
+
+{% block layout %}
+
+<form class="form bml" method="POST" action="/p/add">
 <input type='hidden' name='_csrf_token' value="{{ csrf_token() }}">
 
-{{ render_field(form.title) }}
-{{ render_field(form.url) }}
-{{ render_field(form.desc) }}
+<h1>Pin This Link</h1>
 
+<dt>Title</dt>
+<dd><input type="text" name="title" value="{{ title }}" /></dd>
+
+<dt>URL</dt>
+<dd><input type="text" name="url" value="{{ url }}" /></dd>
+
+<dt>Description</dt>
+<dd><textarea name="desc"></textarea></dd>
+
+<dt>Tags</dt>
+<dd><input type="text" name="tags" id="tags" /></dd>
+
+<div class="form-footer">
+<input type="button" class="btn" value="Cancel" name="" id="cancel" />
 <input type="submit" class="btn btn-primary" value="Pin" name="" />
+</div>
 
 </form>
 
 {% endblock %}
 
 
-
+{% block footer %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base/base.html' %}
+{% from "base/_formhelpers.html" import render_field %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+
+<form class="form" method="POST" action="/login">
+<input type='hidden' name='_csrf_token' value="{{ csrf_token() }}">
+
+{{ render_field(form.email) }}
+{{ render_field(form.password) }}
+
+<input type="submit" class="btn btn-primary" value="Login" name="" />
+
+</form>
+
+{% endblock %}
+
+
+{% block footer %}
+{% endblock %}

@@ -17,6 +17,7 @@
   {% endblock %}
 </head>
 <body>
+    {% block nav %}
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -64,6 +65,7 @@
         </div>
       </div>
     </div>
+    {% endblock %}
 
     {% block layout %}
     <div class="container-fluid">
@@ -82,10 +84,11 @@
           </div>
         </div>
       </div><!--/row-->
-      <hr>
+      {% block footer %}
       <footer>
         {% include 'base/footer.html' %}
       </footer>
+      {% endblock %}
     </div><!--/.fluid-container-->
     {% endblock %}
 

@@ -14,6 +14,7 @@ def login():
   """
   User login
   """
+  is_bookmarklet = request.args.get('b')
 
   form = LoginForm(request.form)
 
@@ -25,9 +26,14 @@ def login():
       user_login(user_id)
       return redirect(url_for('index'))
 
-
   context = make_context({ 'form': form })
-  return render_template('users/login.html', **context)
+
+  if is_bookmarklet:
+    tmpl = 'users/bookmarklet-login.html'
+  else:
+    tmpl = 'users/login.html'
+
+  return render_template(tmpl, **context)
   
 
 

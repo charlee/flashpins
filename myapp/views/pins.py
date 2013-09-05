@@ -51,6 +51,7 @@ def add():
 
 
 @app.route('/add', methods=['POST', 'GET'])
+@require_login(bookmarklet=True)
 def bookmarklet_add():
   """
   Add pin with bookmarklet
@@ -65,6 +66,10 @@ def bookmarklet_add():
     new_pin(url=url, user_id=current_user_id(), title=title, desc=desc)
 
     return render_template('pins/bookmarklet_add_ok.html')
+
+  else:
+    title = request.args.get('t')
+    url = request.args.get('l')
 
   context = make_context({ 'form': form })
   return render_template('pins/bookmarklet_add.html', **context)

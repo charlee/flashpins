@@ -1,0 +1,52 @@
+$lightgray: #e3e3e3;     // for background color
+$left-margin: 17px;
+$label-width: 100px;
+
+/* for the bookmarklet add dialog */
+body {
+  background: $lightgray;
+  padding: 20px; 
+}
+
+form.bml {
+  background: #fff;
+  width: 100% !important;
+  box-sizing: border-box;
+  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.44);
+  -moz-box-shadow: 0 2px 5px rgba(0,0,0,0.44);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.44);
+
+  h1 {
+    padding: 8px $left-margin 4px $left-margin;
+    font-size: 20px;
+    border-bottom: solid 1px $lightgray;
+  }
+
+  dt {
+    float: left;
+    font-size: 14px;
+    line-height: 24px;
+    width: $label-width;
+    margin-left: $left-margin; 
+  }
+
+  dd {
+    margin-left: $label-width + $left-margin;
+
+    >input[type=text], >textarea {
+      width: 515px;
+    }
+  }
+
+  .form-footer {
+    margin-top: 14px;
+    border-top: solid 1px $lightgray;
+    padding: 10px $left-margin;
+    background: #f0f0f0;
+    text-align: right;
+  }
+
+
+}
+
+

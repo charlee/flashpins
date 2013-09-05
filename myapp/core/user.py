@@ -6,7 +6,7 @@ from myapp import bcrypt
 
 from .models import User
 
-def require_login():
+def require_login(bookmarklet=False):
   """
   Login required decorator
   """
@@ -19,7 +19,11 @@ def require_login():
       if user_id:
         return f(*args, **kwargs)
 
-      return redirect(url_for('login'))
+      url = url_for('login')
+      if bookmarklet:
+        url += "?b=1"
+
+      return redirect(url)
 
     return _
 
@@ -44,7 +48,7 @@ def j_require_login():
     return _
 
   return outer
-  
+
 
 def current_user_id():
   user_id = session.get('LOGIN_USER_ID', None)
