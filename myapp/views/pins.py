@@ -69,9 +69,12 @@ def bookmarklet_add():
 
   else:
     title = request.args.get('t')
-    url = request.args.get('l')
+    url = request.args.get('u')
 
-  context = make_context({ 'form': form })
+  context = make_context({
+    'title': title,
+    'url': url,
+  })
   return render_template('pins/bookmarklet_add.html', **context)
 
 

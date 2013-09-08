@@ -15,7 +15,7 @@ $(document).ready(function() {
 
 {% block layout %}
 
-<form class="form bml" method="POST" action="/p/add">
+<form class="form bml" method="POST" action="/add">
 <input type='hidden' name='_csrf_token' value="{{ csrf_token() }}">
 
 <h1>Pin This Link</h1>
