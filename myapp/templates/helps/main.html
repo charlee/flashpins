@@ -6,6 +6,6 @@
 
 <p>Drag this button to your bookmark bar!</p>
 
-<a class="btn btn-primary" href="javascript:void((function(d,l){ open('{{ host }}add?u='+l.href+'&t='+d.title,'','width=720,height=410,title=0,scrollbars=0,toolbar=0,menubar=0') })(document,location))" >FlashPin!</a>
+<a class="btn btn-primary" href="javascript:void((function(d,l,e){ open('{{ host }}add?u='+e(l.href)+'&t='+e(d.title),'','width=720,height=410,title=0,scrollbars=0,toolbar=0,menubar=0') })(document,location,encodeURIComponent))" >FlashPin!</a>
 
 {% endblock %}
