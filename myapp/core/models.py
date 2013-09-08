@@ -16,8 +16,10 @@ Define common ops for data models
 #######################################################################
 
 import re
+import datetime
 from myapp import rds 
 from myapp.utils.crypt import urlhash
+
 
 # Link
 
@@ -230,6 +232,14 @@ class Link(BaseHash):
     'access_date': 0,
   }
 
+  def local_add_date(self):
+    if self.add_date:
+      timestr = datetime.datetime.fromtimestamp(int(self.add_date)).strftime('%Y-%m-%d %H:%M:%S')
+      return timestr
+      
+    else:
+      return ''
+
   def pin_count(self):
     return rds.get(self.KEY_PIN_COUNT % self.id)
 
@@ -354,6 +364,15 @@ class Pin(BaseHash):
     h = super(Pin, self).as_hash()
     h['tags'] = self.tags()
     return h
+
+
+  def local_add_date(self):
+    if self.add_date:
+      timestr = datetime.datetime.fromtimestamp(int(self.add_date)).strftime('%Y-%m-%d %H:%M:%S')
+      return timestr
+      
+    else:
+      return ''
 
 
 class User(BaseHash):

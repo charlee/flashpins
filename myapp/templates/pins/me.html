@@ -38,7 +38,7 @@
     </span>
   </div>
 
-  <div class="pin-date pull-left"><small>{{ pin.link.add_date }}</small></div>
+  <div class="pin-date pull-left"><small>{{ pin.local_add_date() }}</small></div>
   <div class="pin-tags pull-left">
   {% if pin.private == '1' %}
     <span class="pin-tag label label-important">private</span>

@@ -31,11 +31,10 @@ def import_pins_task(user_id, file_key):
     if url:
 
       try:
-        ts = int(add_date)
-        d = datetime.fromtimestamp(ts)
+        add_date = int(add_date)
       except:
-        d = datetime.now()
+        add_date = int(time.time())
 
-      new_pin(url, user_id, title=title, tags=tags, add_date=d, icon=icon, private=private)
+      new_pin(url, user_id, title=title, tags=tags, add_date=add_date, icon=icon, private=private)
 
 

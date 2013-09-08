@@ -16,6 +16,10 @@ def new_pin(url, user_id, title='', desc='', tags=[], add_date=None, icon='', pr
   New pin
   return None if already pinned this
   """
+  # get default date
+  if add_date is None:
+    add_date = int(time.time())
+
   link_id = get_link_id(url, title=title, icon=icon, add_date=add_date, tags=tags)
 
   # get the link tilte to check if user changed the title
