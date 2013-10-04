@@ -1,12 +1,12 @@
 # -*- coding:utf8 -*-
 
-from wtforms import Form, TextField, PasswordField, FileField, validators
+from wtforms import Form, TextField, PasswordField, FileField, BooleanField, validators
 
 
 class LoginForm(Form):
   email = TextField('Email')
   password = PasswordField('Password')
-
+  remember = BooleanField('Remember Me')
 
 class RegisterForm(Form):
   email = TextField('Email', [validators.Email()])

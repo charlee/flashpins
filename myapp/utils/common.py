@@ -1,10 +1,12 @@
 # -*- coding:utf8 -*-
 
-from myapp.core.models import User
-from myapp.core.user import current_user_id
+import random
 
 def make_context(params):
     
+  from myapp.core.models import User
+  from myapp.core.user import current_user_id
+
   context = {}
 
   user_id = current_user_id()
@@ -55,3 +57,15 @@ def score_list(l):
   Used by redis.ZADD
   """
   return [ x for y in l for x in (1, y) ]
+
+
+def random_string(length, chars=None):
+  """
+  make a random string
+    chars: string that contains all available chars
+  """
+  if chars is None:
+    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  return ''.join(random.choice(chars) for x in range(length))
+

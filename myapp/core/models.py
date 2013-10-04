@@ -19,6 +19,7 @@ import re
 import datetime
 from myapp import rds 
 from myapp.utils.crypt import urlhash
+from myapp.utils.common import random_string
 
 
 # Link
@@ -399,6 +400,14 @@ class User(BaseHash):
   # store pins under a tag (SET)
   KEY_TAG_PINS = 'fp:user:%s:tag:%s:pins'
 
+  # persist-cookie pair key
+  # this is used to store a cookie-user pairs for "Remember Me" on the login screen
+  #   param: random number
+  #   value: user id
+  # key will expire after 3 months(=3 * 30 * 86400)
+  KEY_COOKIE_PAIR = 'fp:user:cookie:%s'
+  COOKIE_PAIR_EXPIRE = 3 * 30 * 86400
+
   fields = {
     'email': '',
     'screen_name': '',
@@ -532,6 +541,34 @@ class User(BaseHash):
     pin_ids.sort(reverse=True)
 
     return pin_ids
+
+
+  @classmethod
+  def get_cookie_pair(cls, digest):
+    """
+    Return user_id corresponding to digest
+    """
+    return rds.get(cls.KEY_COOKIE_PAIR % digest)
+
+  def make_cookie_pair(self):
+    """
+    Generate a cookie digest-userid pair
+    """
+    digest = random_string(16)
+    p = rds.pipeline()
+    key = self.KEY_COOKIE_PAIR % digest
+    p.set(key, self.id)
+    p.expire(key, self.COOKIE_PAIR_EXPIRE)
+    p.execute()
+
+    return digest
+
+  @classmethod
+  def remove_cookie_pair(cls, digest):
+    """
+    remove cookie-userid pair
+    """
+    rds.delete(cls.KEY_COOKIE_PAIR % digest)
 
 
 class Global(object):
