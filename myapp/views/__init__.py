@@ -10,6 +10,7 @@ from myapp.utils.common import make_context
 import pins
 import users
 import helps
+import tags
 
 from .api.pins import api_pins
 

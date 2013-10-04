@@ -62,6 +62,8 @@
 <div class="block">
   <h4>My Tags</h4>
 
+  (<a href="/me/tags">Tag Cloud</a>)
+
   <ul>
   {% for tag in my_tags %}
   <li><a href="/me/t/{{ tag[0] }}">{{ tag[0] }}</a> ({{ tag[1] }})</li>
