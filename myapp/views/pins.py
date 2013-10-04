@@ -62,8 +62,10 @@ def bookmarklet_add():
     title = form.title.data or ''
     url = form.url.data or ''
     desc = form.desc.data or ''
+    tags = form.tags.data or ''
+    tags = filter(None, map(lambda x:x.strip(), tags.split(',')))
 
-    new_pin(url=url, user_id=current_user_id(), title=title, desc=desc)
+    new_pin(url=url, user_id=current_user_id(), title=title, desc=desc, tags=tags)
 
     return render_template('pins/bookmarklet_add_ok.html')
 

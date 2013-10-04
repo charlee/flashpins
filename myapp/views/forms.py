@@ -27,6 +27,7 @@ class PinAddForm(Form):
   title= TextField()
   url = TextField()
   desc = TextField()
+  tags = TextField()
 
 
 class PinImportForm(Form):
