@@ -1,13 +1,69 @@
 # -*- coding:utf8 -*-
 
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, g
 from myapp import app
-from myapp.core.user import new_user, update_password, current_user_id, require_login, authenticate, login as user_login, logout as user_logout, set_persist_cookie, clear_persist_cookie
+from myapp.core.user import new_user, update_password, current_user_id, require_login, authenticate, login as user_login, logout as user_logout
 from myapp.core.models import User
 from myapp.utils.common import make_context
 
 from forms import LoginForm, RegisterForm, SettingsAccountForm, SettingsProfileForm
 
+PERSIST_COOKIE_NAME = 'np'
+PERSIST_MAX_AGE = User.COOKIE_PAIR_EXPIRE
+
+@app.before_request
+def check_login_cookie():
+  """
+  Check if the persist cookie is valid
+  log user in if cookie is valid
+  """
+
+  # shortcut if already logged in
+  if current_user_id() is not None:
+    return
+
+  # check login cookie
+  persist_cookie = request.cookies.get(PERSIST_COOKIE_NAME, '')
+
+  if ':' in persist_cookie:
+    (user_id, digest) = persist_cookie.split(':')
+
+    # check db for cookie validation
+    expected_id = User.get_cookie_pair(digest)
+
+    if user_id == expected_id:
+
+      # valid, generate new cookie and allow login
+      user_login(user_id)
+
+      User.remove_cookie_pair(digest)
+
+      # set cookie flag, used to set cookie in after_request() functions
+      g._persist_cookie_user = user_id
+      
+
+
+@app.after_request
+def set_login_cookie(response):
+  """
+  Set persist cookie for user
+  """
+  cookie_user_id = getattr(g, '_persist_cookie_user', None)
+
+  if cookie_user_id is not None:
+
+    g._persist_cookie_user = None
+
+    user_ref = User.ref(cookie_user_id)
+
+    if user_ref is not None:
+      
+      digest = user_ref.make_cookie_pair()
+      cookie = "%s:%s" % (cookie_user_id, digest)
+      response.set_cookie(PERSIST_COOKIE_NAME, cookie, max_age=PERSIST_MAX_AGE, httponly=True)
+
+  return response
+  
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -30,7 +86,7 @@ def login():
       resp = redirect(url_for('index'))
 
       if remember:
-        set_persist_cookie(resp, user_id)
+        g._persist_cookie_user = user_id
 
       return resp
 
@@ -55,7 +111,7 @@ def logout():
 
   # clear cookie
   resp = redirect(url_for('index'))
-  clear_persist_cookie(resp)
+  resp.set_cookie(PERSIST_COOKIE_NAME, expires=1)
   return resp
 
 
