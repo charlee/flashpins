@@ -29,14 +29,14 @@ def require_login(bookmarklet=False):
         if ':' in persist_cookie:
           (user_id, digest) = persist_cookie.split(':')
 
-          login(user_id)
-
           # check db for cookie validation
           expected_id = User.get_cookie_pair(digest)
 
           if user_id == expected_id:
 
             # valid, generate new cookie and allow login
+            login(user_id)
+
             resp = f(*args, **kwargs)
 
             if type(resp) == str or type(resp) == unicode:
