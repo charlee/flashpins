@@ -60,6 +60,10 @@ footer {
     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.1);
   }
 
+  &:hover .pin-meta {
+    display: block;
+  }
+
 }
 
 .pin-count {
@@ -114,6 +118,7 @@ footer {
 
 .pin-meta {
   margin-left: 10px;
+  display: none;
 }
 
 .pin-edit, .pin-save, .pin-delete {
