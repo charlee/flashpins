@@ -46,4 +46,6 @@ myapp/static/js/*.js
 myapp/static/css/*.css
 
 logs
+log
+run
 nohup.out
